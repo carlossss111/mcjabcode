@@ -1,10 +1,11 @@
-package uk.ac.nottingham.hybridarcade;
+package uk.ac.nottingham.hybridarcade.setup;
 
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.Logger;
+import uk.ac.nottingham.hybridarcade.Constants;
 
 public class ModEventHandlers {
     final Logger log = Constants.logger;
@@ -21,6 +22,7 @@ public class ModEventHandlers {
         // Add to the Combat tab
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(Main.MAGIC_WAND);
+            event.accept(Main.MARKER_BLOCK_ITEM);
         }
     }
 }
