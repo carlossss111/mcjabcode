@@ -1,8 +1,17 @@
 package uk.ac.nottingham.hybridarcade;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraftforge.common.extensions.IForgeItem;
 import org.apache.logging.log4j.Logger;
 
@@ -22,5 +31,11 @@ public class MagicWand extends SwordItem implements IForgeItem {
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         log.info("Mob Type: " + entity.getType().getDescriptionId());
         return false;
+    }
+
+    @Override
+    public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, Player player) {
+        log.info("Block Position: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+        return true;
     }
 }

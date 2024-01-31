@@ -6,7 +6,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.Logger;
 
-public class GlobalHandlers {
+public class ModEventHandlers {
     final Logger log = Constants.logger;
 
     // Called on launch
