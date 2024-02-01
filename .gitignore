@@ -5,6 +5,7 @@
 # Build Dirs
 build/
 run/
+logs/
 
 # Disable autocrlf on generated files, they always generate with LF
 # Add any extra files or paths here to make git stop saying they

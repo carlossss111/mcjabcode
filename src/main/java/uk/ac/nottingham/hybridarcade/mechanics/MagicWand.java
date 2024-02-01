@@ -1,9 +1,6 @@
 package uk.ac.nottingham.hybridarcade.mechanics;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.OutgoingChatMessage;
-import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -16,11 +13,11 @@ import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 
 public class MagicWand extends Item implements IForgeItem {
-    private final AreaSelection areaSelection;
+    private final AreaSelection mAreaSelection;
 
     public MagicWand() {
         super(new Item.Properties());
-        areaSelection = new AreaSelection();
+        mAreaSelection = new AreaSelection();
     }
 
     @Override
@@ -37,26 +34,25 @@ public class MagicWand extends Item implements IForgeItem {
                 .equals(String.format("block.%s.%s", Constants.MOD_ID, Constants.MARKER_BLOCK_ID))) {
 
             // Add a vertex
-            areaSelection.addVertex(pos);
+            mAreaSelection.addMarker(pos);
 
-            // Print all the verices as a chat message
+            // Print all the vertices as a chat message
             Utility.sendChat(String.format("%s, %s, %s, %s",
-                    areaSelection.getVertexAsString(0),
-                    areaSelection.getVertexAsString(1),
-                    areaSelection.getVertexAsString(2),
-                    areaSelection.getVertexAsString(3)));
+                    mAreaSelection.getMarkerAsString(0),
+                    mAreaSelection.getMarkerAsString(1),
+                    mAreaSelection.getMarkerAsString(2),
+                    mAreaSelection.getMarkerAsString(3)));
         }
         return true;
     }
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        Player player = context.getPlayer();
-        if(player.level().isClientSide()){
+        if(context.getLevel().isClientSide()){
             return InteractionResult.PASS;
         }
 
-        int blocksStored = areaSelection.storeBlocks();
+        int blocksStored = mAreaSelection.storeAndPrintBlocks(context.getLevel());
         Utility.sendChat("Blocks Stored: " + blocksStored);
         return InteractionResult.PASS;
     }
