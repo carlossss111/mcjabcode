@@ -1,6 +1,6 @@
 {
   "parent" : "item/generated",
   "textures" : {
-    "layer0": "hybridarcade:item/magic_wand"
+    "layer0": "hybridarcade:item/copy_wand"
   }
 }

@@ -21,7 +21,8 @@ public class ModEventHandlers {
     public void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         // Add to the Combat tab
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            event.accept(Main.MAGIC_WAND);
+            event.accept(Main.COPY_WAND);
+            event.accept(Main.PASTE_WAND);
             event.accept(Main.MARKER_BLOCK_ITEM);
         }
     }

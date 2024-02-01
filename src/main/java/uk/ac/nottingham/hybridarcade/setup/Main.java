@@ -14,7 +14,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import uk.ac.nottingham.hybridarcade.Constants;
-import uk.ac.nottingham.hybridarcade.mechanics.MagicWand;
+import uk.ac.nottingham.hybridarcade.mechanics.CopyItem;
+import uk.ac.nottingham.hybridarcade.mechanics.PasteItem;
 
 @Mod(Constants.MOD_ID)
 public class Main {
@@ -40,8 +41,11 @@ public class Main {
             = ITEMS.register(Constants.MARKER_BLOCK_ITEM_ID,
             () -> new BlockItem(MARKER_BLOCK.get(), new Item.Properties()));
 
-    static final RegistryObject<Item> MAGIC_WAND
-            = ITEMS.register(Constants.MAGIC_WAND_ID, MagicWand::new);
+    static final RegistryObject<Item> COPY_WAND
+            = ITEMS.register(Constants.COPY_WAND_ID, CopyItem::new);
+
+    static final RegistryObject<Item> PASTE_WAND
+            = ITEMS.register(Constants.PASTE_WAND_ID, PasteItem::new);
 
     // Called before anything else when the mod is loaded
     public Main() {

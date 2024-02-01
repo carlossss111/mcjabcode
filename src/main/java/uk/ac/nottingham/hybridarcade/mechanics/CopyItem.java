@@ -12,12 +12,12 @@ import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 
-public class MagicWand extends Item implements IForgeItem {
-    private final AreaSelection mAreaSelection;
+public class CopyItem extends Item implements IForgeItem {
+    private final CopySelection mCopySelection;
 
-    public MagicWand() {
+    public CopyItem() {
         super(new Item.Properties());
-        mAreaSelection = new AreaSelection();
+        mCopySelection = new CopySelection();
     }
 
     @Override
@@ -34,14 +34,14 @@ public class MagicWand extends Item implements IForgeItem {
                 .equals(String.format("block.%s.%s", Constants.MOD_ID, Constants.MARKER_BLOCK_ID))) {
 
             // Add a vertex
-            mAreaSelection.addMarker(pos);
+            mCopySelection.addMarker(pos);
 
             // Print all the vertices as a chat message
             Utility.sendChat(String.format("%s, %s, %s, %s",
-                    mAreaSelection.getMarkerAsString(0),
-                    mAreaSelection.getMarkerAsString(1),
-                    mAreaSelection.getMarkerAsString(2),
-                    mAreaSelection.getMarkerAsString(3)));
+                    mCopySelection.getMarkerAsString(0),
+                    mCopySelection.getMarkerAsString(1),
+                    mCopySelection.getMarkerAsString(2),
+                    mCopySelection.getMarkerAsString(3)));
         }
         return true;
     }
@@ -52,8 +52,8 @@ public class MagicWand extends Item implements IForgeItem {
             return InteractionResult.PASS;
         }
 
-        int blocksStored = mAreaSelection.storeAndPrintBlocks(context.getLevel());
-        Utility.sendChat("Blocks Stored: " + blocksStored);
+        int blocksStored = mCopySelection.copyAndPrintBlocks(context.getLevel());
+        Utility.sendChat("Blocks Copied: " + blocksStored);
         return InteractionResult.PASS;
     }
 }

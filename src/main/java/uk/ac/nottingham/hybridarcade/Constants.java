@@ -9,5 +9,6 @@ public class Constants {
 
     public static final String MARKER_BLOCK_ID = "marker_block";
     public static final String MARKER_BLOCK_ITEM_ID = "marker_block_item";
-    public static final String MAGIC_WAND_ID = "magic_wand";
+    public static final String COPY_WAND_ID = "copy_wand";
+    public static final String PASTE_WAND_ID = "paste_wand";
 }

@@ -3,12 +3,13 @@ package uk.ac.nottingham.hybridarcade.mechanics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import uk.ac.nottingham.hybridarcade.Utility;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class AreaSelection {
+public class CopySelection {
     private final static int NUM_OF_MARKERS = 4; //this should never be changed!
 
     private BlockState[][][] mBlocks;
@@ -90,7 +91,7 @@ public class AreaSelection {
 
     // Stores the blocks *if valid*
     // Returns the number of blocks stored (hence 0 indicates the space was invalid)
-    public int storeAndPrintBlocks(LevelAccessor level){
+    public int copyAndPrintBlocks(LevelAccessor level){
         // Check validity and pick starting vertex
         if(!isValidCuboid()){
             return 0;
@@ -126,6 +127,7 @@ public class AreaSelection {
 
         // TODO: print here
         // printToCard();
+        Utility.debugBlocks = Arrays.copyOf(mBlocks, mBlocks.length);
 
         // Return volume
         return Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ);
