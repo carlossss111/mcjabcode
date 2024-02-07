@@ -4,11 +4,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 
 public class PasteSelection {
     private static final int REFRESH_BLOCKS_CODE = 3;
 
     private BlockState[][][] mBlocks;
+    private BlockConverter mBlockConverter;
+
+    public PasteSelection(BlockConverter blockConverter) {
+        mBlockConverter = blockConverter;
+    }
 
     // Paste blocks into the level if stored,
     // should be called on BOTH the renderer and server Thread.
@@ -36,9 +42,10 @@ public class PasteSelection {
 
     // Scans, returns true if success
     public boolean scanAndStoreBlocks(){
-        //TODO: stub
 
-        mBlocks = Utility.debugBlocks;
+        // Convert to blocks
+        mBlocks = mBlockConverter.toBlocks(Utility.debugBlockBytes);
+
         return mBlocks != null;
     }
 }

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -13,7 +14,12 @@ public class CopySelection {
     private final static int NUM_OF_MARKERS = 4; //this should never be changed!
 
     private BlockState[][][] mBlocks;
+    private BlockConverter mBlockConverter;
     private final BlockPos[] mMarkers = new BlockPos[NUM_OF_MARKERS];
+
+    public CopySelection(BlockConverter blockConverter){
+        mBlockConverter = blockConverter;
+    }
 
     // Adds the next vertex along, unless it is full then clears and tries again
     public void addMarker(BlockPos blockPosition) {
@@ -125,9 +131,8 @@ public class CopySelection {
             i++;
         }
 
-        // TODO: print here
-        // printToCard();
-        Utility.debugBlocks = Arrays.copyOf(mBlocks, mBlocks.length);
+        // Convert to bytes
+        Utility.debugBlockBytes = mBlockConverter.toBytes(mBlocks);
 
         // Return volume
         return Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ);

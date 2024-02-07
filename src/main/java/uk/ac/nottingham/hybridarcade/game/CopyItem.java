@@ -11,13 +11,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 
 class CopyItem extends Item implements IForgeItem {
     private final CopySelection mCopySelection;
 
     CopyItem() {
         super(new Item.Properties());
-        mCopySelection = new CopySelection();
+        mCopySelection = new CopySelection(BlockConverter.getInstance());
     }
 
     @Override
@@ -52,8 +53,11 @@ class CopyItem extends Item implements IForgeItem {
             return InteractionResult.PASS;
         }
 
-        int blocksStored = mCopySelection.copyAndPrintBlocks(context.getLevel());
-        Utility.sendChat("Blocks Copied: " + blocksStored);
+        new Thread(() -> {
+            int blocksStored = mCopySelection.copyAndPrintBlocks(context.getLevel());
+            Utility.sendChat("Blocks Copied: " + blocksStored);
+        }).start();
+
         return InteractionResult.PASS;
     }
 }

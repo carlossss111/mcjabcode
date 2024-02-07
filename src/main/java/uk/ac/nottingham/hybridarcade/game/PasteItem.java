@@ -11,13 +11,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 
 class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
 
     PasteItem() {
         super(new Properties());
-        mPasteSelection = new PasteSelection();
+        mPasteSelection = new PasteSelection(BlockConverter.getInstance());
     }
 
     @Override
@@ -46,13 +47,15 @@ class PasteItem extends Item implements IForgeItem {
         }
 
         // Scan blocks from scanner
-        Utility.sendChat("Scanning blocks...");
-        if(mPasteSelection.scanAndStoreBlocks()){
-            Utility.sendChat("Finished scanning and ready to paste.");
-        }
-        else{
-            Utility.sendChat("Failed to scan! Try again.");
-        }
+        new Thread(() -> {
+            Utility.sendChat("Scanning blocks...");
+            if(mPasteSelection.scanAndStoreBlocks()){
+                Utility.sendChat("Finished scanning and ready to paste.");
+            }
+            else{
+                Utility.sendChat("Failed to scan! Try again.");
+            }
+        }).start();
 
         return InteractionResult.PASS;
     }

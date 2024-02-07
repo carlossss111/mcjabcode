@@ -3,7 +3,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.game.PasteSelection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,17 +14,19 @@ public class TestPasteSelection {
     private final BlockPos CENTER_POSITION = new BlockPos(0,0,0);
     PasteSelection mPasteSelection = null;
     LevelAccessor mLevel = null;
+    BlockConverter mBlockConverter = null;
 
     @BeforeEach
     public void setup() {
-        mPasteSelection = new PasteSelection();
+        mBlockConverter = mock(BlockConverter.class);
+        mPasteSelection = new PasteSelection(mBlockConverter);
         mLevel = mock(LevelAccessor.class);
     }
 
     @Test
     public void testInvalidSelectionNull() {
         BlockState blocks[][][] = null;
-        Utility.debugBlocks = blocks; // TODO: replace with mock
+        when(mBlockConverter.toBlocks(any())).thenReturn(blocks);
         mPasteSelection.scanAndStoreBlocks();
         int numStored = mPasteSelection.pasteBlocks(mLevel, CENTER_POSITION);
         verify(mLevel, times(0)).setBlock(any(), any(), anyInt());
@@ -34,7 +36,7 @@ public class TestPasteSelection {
     @Test
     public void testPastesSelectionBasic() {
         BlockState[][][] blocks = new BlockState[2][2][2];
-        Utility.debugBlocks = blocks; // TODO: replace with mock
+        when(mBlockConverter.toBlocks(any())).thenReturn(blocks);
         mPasteSelection.scanAndStoreBlocks();
         int numStored = mPasteSelection.pasteBlocks(mLevel, CENTER_POSITION);
         verify(mLevel, times(8)).setBlock(any(), any(), anyInt());
@@ -44,7 +46,7 @@ public class TestPasteSelection {
     @Test
     public void testPastesSelectionInCorrectPlace() {
         BlockState[][][] blocks = new BlockState[2][2][2];
-        Utility.debugBlocks = blocks; // TODO: replace with mock
+        when(mBlockConverter.toBlocks(any())).thenReturn(blocks);
         mPasteSelection.scanAndStoreBlocks();
         int numStored = mPasteSelection.pasteBlocks(mLevel, new BlockPos(10,10,10));
         verify(mLevel).setBlock(eq(new BlockPos(10,10,10)), any(), anyInt());
