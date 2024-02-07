@@ -1,4 +1,4 @@
-package uk.ac.nottingham.hybridarcade.mechanics;
+package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;

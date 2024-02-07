@@ -1,4 +1,4 @@
-package uk.ac.nottingham.hybridarcade.setup;
+package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
@@ -14,8 +14,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import uk.ac.nottingham.hybridarcade.Constants;
-import uk.ac.nottingham.hybridarcade.mechanics.CopyItem;
-import uk.ac.nottingham.hybridarcade.mechanics.PasteItem;
 
 @Mod(Constants.MOD_ID)
 public class Main {

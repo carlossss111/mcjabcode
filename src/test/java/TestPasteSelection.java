@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.Utility;
-import uk.ac.nottingham.hybridarcade.mechanics.PasteSelection;
+import uk.ac.nottingham.hybridarcade.game.PasteSelection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

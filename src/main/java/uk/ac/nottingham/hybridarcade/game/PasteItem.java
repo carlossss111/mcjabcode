@@ -1,4 +1,4 @@
-package uk.ac.nottingham.hybridarcade.mechanics;
+package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -12,10 +12,10 @@ import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 
-public class PasteItem extends Item implements IForgeItem {
+class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
 
-    public PasteItem() {
+    PasteItem() {
         super(new Properties());
         mPasteSelection = new PasteSelection();
     }

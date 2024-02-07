@@ -1,4 +1,4 @@
-package uk.ac.nottingham.hybridarcade.setup;
+package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -7,18 +7,18 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.Logger;
 import uk.ac.nottingham.hybridarcade.Constants;
 
-public class ModEventHandlers {
+class ModEventHandlers {
     final Logger log = Constants.logger;
 
     // Called on launch
     @SubscribeEvent
-    public void commonSetup(final FMLCommonSetupEvent event) {
+    void commonSetup(final FMLCommonSetupEvent event) {
         log.info("Event handlers loaded.");
     }
 
     // Called on opening the 'Creative' menu
     @SubscribeEvent
-    public void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+    void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         // Add to the Combat tab
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(Main.COPY_WAND);

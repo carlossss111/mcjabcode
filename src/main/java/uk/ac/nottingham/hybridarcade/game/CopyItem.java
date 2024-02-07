@@ -1,4 +1,4 @@
-package uk.ac.nottingham.hybridarcade.mechanics;
+package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -12,10 +12,10 @@ import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 
-public class CopyItem extends Item implements IForgeItem {
+class CopyItem extends Item implements IForgeItem {
     private final CopySelection mCopySelection;
 
-    public CopyItem() {
+    CopyItem() {
         super(new Item.Properties());
         mCopySelection = new CopySelection();
     }

@@ -3,7 +3,7 @@ import net.minecraft.world.level.LevelAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.ac.nottingham.hybridarcade.mechanics.CopySelection;
+import uk.ac.nottingham.hybridarcade.game.CopySelection;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
