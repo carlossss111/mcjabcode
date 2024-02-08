@@ -99,6 +99,7 @@ public class BlockConverter {
                 }
             }
         }
+        stream.write(0);
         return stream.toByteArray();
     }
 

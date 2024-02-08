@@ -5,8 +5,10 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
+import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -132,7 +134,9 @@ public class CopySelection {
         }
 
         // Convert to bytes
-        Utility.debugBlockBytes = mBlockConverter.toBytes(mBlocks);
+        byte[] blockBytes = mBlockConverter.toBytes(mBlocks);
+        Utility.debugBlockBytes = blockBytes;
+        new JabEncoder().encode(blockBytes, "test4.png".getBytes(StandardCharsets.US_ASCII));
 
         // Return volume
         return Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ);

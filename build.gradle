@@ -29,6 +29,11 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+
+            // Important for reading the C libraries
+            // TODO: change to relative path
+            property 'java.library.path', '/home/daniel/Repos/dissertation/hybrid_arcade/src/main/resources/encoding'
+
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -88,8 +93,8 @@ tasks.named('test', Test) {
 
     maxHeapSize = '1G'
 
-    // For Java JNI with Jabcode
-    systemProperties['java.library.path'] = "/home/daniel/Repos/dissertation/hybrid_arcade/lib"
+    // Important for reading the C libraries
+    systemProperties['java.library.path'] = "src/main/resources/encoding"
 
     testLogging {
         events "passed"

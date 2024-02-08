@@ -3,7 +3,7 @@ package uk.ac.nottingham.hybridarcade.encoding;
 public class QrEncoder implements IEncoder{
 
     @Override
-    public boolean encode(byte[] data, String filePath) {
+    public boolean encode(byte[] data, byte[] filePath) {
         return false;
     }
 

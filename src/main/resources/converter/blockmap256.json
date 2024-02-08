@@ -1,9 +1,9 @@
 {
-  "block.minecraft.air":            0,
-  "block.minecraft.stone":          1,
-  "block.minecraft.grass_block":    2,
-  "block.minecraft.dirt":           3,
-  "block.minecraft.oak_planks":     4,
-  "block.minecraft.oak_log":        5,
-  "block.minecraft.cobblestone":    6
+  "block.minecraft.air":            65,
+  "block.minecraft.stone":          66,
+  "block.minecraft.grass_block":    67,
+  "block.minecraft.dirt":           68,
+  "block.minecraft.oak_planks":     69,
+  "block.minecraft.oak_log":        70,
+  "block.minecraft.cobblestone":    71
 }

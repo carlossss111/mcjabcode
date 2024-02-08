@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_printJab
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject, jbyteArray, jbyteArray);
 
 #ifdef __cplusplus
 }

@@ -2,14 +2,10 @@ PREFIX 	=
 CC 	= $(PREFIX)gcc
 CFLAGS	 = -O2 -std=c11
 
-TARGET = lib
-
-OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
-
 compile:
-	$(CC) -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux src/main/c/JabEncoder.c -o src/main/c/JabEncoder.o
-	$(CC) -shared -fPIC -o lib/libjabcode.so src/main/c/JabEncoder.o -lc
+	$(CC) $(CFLAGS) -c -fPIC -I. -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -Ijabcode -Isrc/main/c/jabcode/include -O2 -std=c11 src/main/c/JabEncoder.c -o src/main/c/JabEncoder.o
+	$(CC) $(CFLAGS) -shared -fPIC src/main/c/JabEncoder.o -Lsrc/main/c/jabcode/build -ljabcode -Lsrc/main/c/jabcode/lib -ltiff -lpng16 -lz -lm -O2 -std=c11 -o src/main/resources/encoding/libJabEncoder.so -lc
 	rm src/main/c/JabEncoder.o
 
 clean:
-	rm lib/*.so
+	rm src/main/resources/encoding/*.so
