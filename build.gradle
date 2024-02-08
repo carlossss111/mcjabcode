@@ -75,11 +75,21 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+tasks.register('compileCLibrary') {
+    doFirst {
+        exec {
+            commandLine 'make', 'compile'
+        }
+    }
+}
 
 tasks.named('test', Test) {
     useJUnitPlatform()
 
     maxHeapSize = '1G'
+
+    // For Java JNI with Jabcode
+    systemProperties['java.library.path'] = "/home/daniel/Repos/dissertation/hybrid_arcade/lib"
 
     testLogging {
         events "passed"
