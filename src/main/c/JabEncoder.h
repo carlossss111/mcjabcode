@@ -12,8 +12,8 @@ extern "C" {
  * Method:    printJab
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_printJab
-  (JNIEnv *, jobject, jbyteArray, jbyteArray);
+JNIEXPORT void JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
+  (JNIEnv *, jobject, jbyteArray);
 
 #ifdef __cplusplus
 }

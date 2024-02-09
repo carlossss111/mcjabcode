@@ -136,7 +136,7 @@ public class CopySelection {
         // Convert to bytes
         byte[] blockBytes = mBlockConverter.toBytes(mBlocks);
         Utility.debugBlockBytes = blockBytes;
-        new JabEncoder().encode(blockBytes, "test4.png".getBytes(StandardCharsets.US_ASCII));
+        new JabEncoder().encode(blockBytes);
 
         // Return volume
         return Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ);

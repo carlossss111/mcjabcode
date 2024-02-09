@@ -13,8 +13,7 @@ public class TestJabEncoder {
         bytesTest[2] = 67;
         bytesTest[3] = 0;
 
-        byte[] filePath = "test3.png".getBytes(StandardCharsets.US_ASCII);
-        new JabEncoder().encode(bytesTest, filePath);
+        new JabEncoder().encode(bytesTest);
 
     }
 }
