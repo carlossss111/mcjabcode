@@ -9,34 +9,50 @@
 #define NUM_OF_COLOURS 8
 #define NUM_OF_SYMBOLS 1
 
-#define FILE_PATH "jabcode.png"
+struct jab_png{
+	jab_byte* buffer;
+	jab_int32 size;
+}typedef jab_png;
 
-JNIEXPORT void JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
-  (JNIEnv* env, jobject javaObject, jbyteArray byteData){
-	
-	// Convert Types to something sensible
-	jab_int32 streamLength = (*env)->GetArrayLength(env, byteData);
-	jab_byte *jabStream = (*env)->GetByteArrayElements(env, byteData, 0);
-
-	// Initialise encoding and data
+jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength){
+	// Initialise encoding
 	jab_encode* encoding = createEncode(NUM_OF_COLOURS, NUM_OF_SYMBOLS);
-	jab_data* jabDataPtr = (jab_data*) malloc(sizeof(jab_data) + streamLength * sizeof(jab_char));
-	jabDataPtr->length = streamLength;
-	memcpy(jabDataPtr->data, jabStream, streamLength);
+	jab_data* encodingData = (jab_data*) malloc(sizeof(jab_data) + streamInLength * sizeof(jab_char));
+	encodingData->length = streamInLength;
+	memcpy(encodingData->data, streamIn, streamInLength);
 
-	// Generate the JABcode
-	int exitCode = generateJABCode(encoding, jabDataPtr);
+	// Generate JABcode
+	int exitCode = generateJABCode(encoding, encodingData);
 	printf("GENERATE EXIT CODE: %d\n", exitCode);
+
+	// Convert to PNG and copy to memory
+	jab_png *png = malloc(sizeof(jab_png));
+	png->size = getImageSize(encoding->bitmap);
+	png->buffer = malloc(sizeof(jab_char) * png->size);
+	saveImageToMemory(encoding->bitmap, png->buffer, png->size);
+
+	free(encodingData);
+	destroyEncode(encoding);
+    return png;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
+  (JNIEnv* env, jobject obj, jbyteArray jStreamIn){
 	
-	// Save to filesystem
-	// Ideally in later versions, this will just be returned as a bitmap
-	saveImage(encoding->bitmap, FILE_PATH);
+	// Types: Java -> C
+	jab_byte *streamIn = (*env)->GetByteArrayElements(env, jStreamIn, 0);
+	jab_int32 streamInLength = (*env)->GetArrayLength(env, jStreamIn);
 
-	// Free the memory
-	free(jabDataPtr);
-	free(encoding);
-	(*env)->ReleaseByteArrayElements(env, byteData, jabStream, 0);
+	// Do Work
+	jab_png *png = myEncode(streamIn, streamInLength);
 
-	return;
+	// Types: C -> Java
+	jbyteArray streamOut = (*env)->NewByteArray(env, png->size);
+	(*env)->SetByteArrayRegion(env, streamOut, 0, png->size, png->buffer);
+
+	free(png->buffer);
+	free(png);
+	(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
+	return streamOut;
 }
 

@@ -1,10 +1,12 @@
 package uk.ac.nottingham.hybridarcade.encoding;
 
+import java.awt.image.BufferedImage;
+
 public class QrEncoder implements IEncoder{
 
     @Override
-    public boolean encode(byte[] data) {
-        return false;
+    public BufferedImage encode(byte[] data) {
+        return null;
     }
 
     @Override

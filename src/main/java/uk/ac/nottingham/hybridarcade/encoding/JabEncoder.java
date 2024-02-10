@@ -4,12 +4,9 @@ import uk.ac.nottingham.hybridarcade.Constants;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 
 public class JabEncoder implements IEncoder{
-
-    private static final String TEMPORARY_FILE_PATH = "jabcode.png";
 
     static {
         System.loadLibrary("png16");
@@ -21,16 +18,16 @@ public class JabEncoder implements IEncoder{
     private native byte[] saveEncoding(byte[] data);
 
     @Override
-    public boolean encode(byte[] data) {
-        saveEncoding(data);
+    public BufferedImage encode(byte[] data) {
+        BufferedImage pngImage = null;
         try {
-            BufferedImage jabcode = ImageIO.read(new File(TEMPORARY_FILE_PATH));
-            ImageIO.write(jabcode, "png", new File("test6.png"));
+            byte[] pngRaw = saveEncoding(data);
+            pngImage = ImageIO.read(new ByteArrayInputStream(pngRaw));
         }
-        catch(IOException e){
-            Constants.logger.error("Unable to save/read JAB code.");
+        catch(Exception e){
+            Constants.logger.error("Failure generating and saving JABcode.");
         }
-        return false;
+        return pngImage;
     }
 
     @Override
