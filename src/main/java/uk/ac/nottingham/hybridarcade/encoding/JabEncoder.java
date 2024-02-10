@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 public class JabEncoder implements IEncoder{
 
     static {
-        System.loadLibrary("png16");
-        System.loadLibrary("tiff");
-        System.loadLibrary("z");
         System.loadLibrary("JabEncoder");
     }
 

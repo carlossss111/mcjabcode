@@ -10,6 +10,10 @@ Minecraft was selected as an examplea, since it is very modifiable and it has 3-
 1. Later, the encoding can be scanned to bring the selected space back into the game's memory, even on other game-worlds or PCs.
 1. The selected space can be placed back into the game, along with all the blocks that were originally in the space.
 
+## Compilation
+TO DO
+(libs must be compiled with `./configure CFLAGS=-fPIC CXXFLAGS=-fPIC`, more on this later)
+
 ## Usage
 Run with:
 ```
