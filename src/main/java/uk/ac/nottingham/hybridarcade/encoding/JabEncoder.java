@@ -5,6 +5,7 @@ import uk.ac.nottingham.hybridarcade.Constants;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class JabEncoder implements IEncoder{
 
@@ -15,16 +16,12 @@ public class JabEncoder implements IEncoder{
     private native byte[] saveEncoding(byte[] data);
 
     @Override
-    public BufferedImage encode(byte[] data) {
-        BufferedImage pngImage = null;
-        try {
-            byte[] pngRaw = saveEncoding(data);
-            pngImage = ImageIO.read(new ByteArrayInputStream(pngRaw));
+    public BufferedImage encode(byte[] data) throws IOException {
+        byte[] pngRaw = saveEncoding(data);
+        if(pngRaw == null){
+            throw new IOException("C Lib fail failed to generate JAB code");
         }
-        catch(Exception e){
-            Constants.logger.error("Failure generating and saving JABcode.");
-        }
-        return pngImage;
+        return ImageIO.read(new ByteArrayInputStream(pngRaw));
     }
 
     @Override

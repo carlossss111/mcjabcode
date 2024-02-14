@@ -23,7 +23,11 @@ jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength){
 
 	// Generate JABcode
 	int exitCode = generateJABCode(encoding, encodingData);
-	printf("GENERATE EXIT CODE: %d\n", exitCode);
+	if(exitCode != 0){
+		free(encodingData);
+		destroyEncode(encoding);
+		return NULL;
+	}
 
 	// Convert to PNG and copy to memory
 	jab_png *png = malloc(sizeof(jab_png));
@@ -45,6 +49,10 @@ JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEnco
 
 	// Do Work
 	jab_png *png = myEncode(streamIn, streamInLength);
+	if(!png){
+		(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
+		return NULL;
+	}
 
 	// Types: C -> Java
 	jbyteArray streamOut = (*env)->NewByteArray(env, png->size);

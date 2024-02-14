@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     uk_ac_nottingham_hybridarcade_encoding_JabEncoder
  * Method:    printJab

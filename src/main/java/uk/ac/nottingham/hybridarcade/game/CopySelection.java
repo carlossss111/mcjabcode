@@ -3,12 +3,8 @@ package uk.ac.nottingham.hybridarcade.game;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import uk.ac.nottingham.hybridarcade.Utility;
-import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
-import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 
 import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -16,12 +12,7 @@ public class CopySelection {
     private final static int NUM_OF_MARKERS = 4; //this should never be changed!
 
     private BlockState[][][] mBlocks;
-    private BlockConverter mBlockConverter;
     private final BlockPos[] mMarkers = new BlockPos[NUM_OF_MARKERS];
-
-    public CopySelection(BlockConverter blockConverter){
-        mBlockConverter = blockConverter;
-    }
 
     // Adds the next vertex along, unless it is full then clears and tries again
     public void addMarker(BlockPos blockPosition) {
@@ -97,9 +88,13 @@ public class CopySelection {
         return numberOfCentreMarkers == 1;
     }
 
+    public BlockState[][][] getBlocks(){
+        return mBlocks;
+    }
+
     // Stores the blocks *if valid*
     // Returns the number of blocks stored (hence 0 indicates the space was invalid)
-    public int copyAndPrintBlocks(LevelAccessor level){
+    public int copyBlocks(LevelAccessor level){
         // Check validity and pick starting vertex
         if(!isValidCuboid()){
             return 0;
@@ -132,11 +127,6 @@ public class CopySelection {
             }
             i++;
         }
-
-        // Convert to bytes
-        byte[] blockBytes = mBlockConverter.toBytes(mBlocks);
-        Utility.debugBlockBytes = blockBytes;
-        new JabEncoder().encode(blockBytes);
 
         // Return volume
         return Math.abs(maxX - minX) * Math.abs(maxY - minY) * Math.abs(maxZ - minZ);

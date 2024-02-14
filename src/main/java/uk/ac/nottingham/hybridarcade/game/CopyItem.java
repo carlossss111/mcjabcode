@@ -12,13 +12,24 @@ import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
+import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
+import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 class CopyItem extends Item implements IForgeItem {
     private final CopySelection mCopySelection;
+    private final BlockConverter mConverter;
+    private final IEncoder mEncoder;
 
     CopyItem() {
         super(new Item.Properties());
-        mCopySelection = new CopySelection(BlockConverter.getInstance());
+        mCopySelection = new CopySelection();
+        mConverter = BlockConverter.getInstance();
+        mEncoder = new JabEncoder();
     }
 
     @Override
@@ -54,7 +65,40 @@ class CopyItem extends Item implements IForgeItem {
         }
 
         new Thread(() -> {
-            int blocksStored = mCopySelection.copyAndPrintBlocks(context.getLevel());
+            // Copy the blocks from the selection if possible
+            int blocksStored = mCopySelection.copyBlocks(context.getLevel());
+            if(blocksStored == 0) {
+                Utility.sendChat("Failed to copy blocks!");
+                Constants.logger.warn("0 blocks returned from " +
+                        "CopySelection#copyBlocks(context.getLevel())");
+                return;
+            }
+
+            // Store the blocks as a stream of bytes according to the mapping
+            byte[] blocksAsBytestream = mConverter.toBytes(mCopySelection.getBlocks());
+
+            // Get the blocks as a barcode PNG image
+            BufferedImage barcodePNG;
+            try {
+                barcodePNG = mEncoder.encode(blocksAsBytestream);
+            }
+            catch(IOException e){
+                Utility.sendChat("Failed to generate encoding!");
+                Constants.logger.error("IEncoder#encode(bytes) threw an IOException\n" + e);
+                return;
+            }
+
+            // Print out the barcodePNG TODO
+            try {
+                ImageIO.write(barcodePNG, "png", new File("mockoutput.png"));
+            }
+            catch(IOException e){
+                Utility.sendChat("Failed to print out encoding!");
+                Constants.logger.error("W.I.P.");
+                return;
+            }
+
+            // Confirm
             Utility.sendChat("Blocks Copied: " + blocksStored);
         }).start();
 

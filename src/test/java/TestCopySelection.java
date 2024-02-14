@@ -13,12 +13,10 @@ import static org.mockito.Mockito.*;
 public class TestCopySelection {
     CopySelection mCopySelectionMock = null;
     LevelAccessor mLevelMock = null;
-    BlockConverter mBlockConverterMock = null;
 
     @BeforeEach
     public void setup() {
-        mBlockConverterMock = mock(BlockConverter.class);
-        mCopySelectionMock = new CopySelection(mBlockConverterMock);
+        mCopySelectionMock = new CopySelection();
         mLevelMock = mock(LevelAccessor.class);
     }
 
@@ -71,7 +69,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(1, 0, 0));
             mCopySelectionMock.addMarker(new BlockPos(0, 1, 1));
             mCopySelectionMock.addMarker(new BlockPos(0, 1, 0));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(0)).getBlockState(any());
             assertEquals(0, numStored);
         }
@@ -82,7 +80,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(1, 0, 0));
             mCopySelectionMock.addMarker(new BlockPos(0, 1, 0));
             mCopySelectionMock.addMarker(new BlockPos(1, 1, 0));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(0)).getBlockState(any());
             assertEquals(0, numStored);
         }
@@ -93,7 +91,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 2));
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 3));
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 4));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(0)).getBlockState(any());
             assertEquals(0, numStored);
         }
@@ -104,7 +102,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(null);
             mCopySelectionMock.addMarker(null);
             mCopySelectionMock.addMarker(null);
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(0)).getBlockState(any());
             assertEquals(0, numStored);
         }
@@ -115,7 +113,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(1, 0, 0));
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 1));
             mCopySelectionMock.addMarker(new BlockPos(0, 1, 0));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(8)).getBlockState(any());
             assertEquals(8, numStored);
         }
@@ -126,7 +124,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(-1, 0, 0));
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 1));
             mCopySelectionMock.addMarker(new BlockPos(0, -1, 0));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(8)).getBlockState(any());
             assertEquals(8, numStored);
         }
@@ -138,7 +136,7 @@ public class TestCopySelection {
             mCopySelectionMock.addMarker(new BlockPos(-9, 0, 0));
             mCopySelectionMock.addMarker(new BlockPos(0, 0, 29));
             mCopySelectionMock.addMarker(new BlockPos(0, 19, 0));
-            int numStored = mCopySelectionMock.copyAndPrintBlocks(mLevelMock);
+            int numStored = mCopySelectionMock.copyBlocks(mLevelMock);
             verify(mLevelMock, times(6000)).getBlockState(any());
             assertEquals(6000, numStored);
         }
