@@ -1,11 +1,12 @@
 package uk.ac.nottingham.hybridarcade.encoding;
 
-import uk.ac.nottingham.hybridarcade.Constants;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class JabEncoder implements IEncoder{
 
@@ -14,6 +15,8 @@ public class JabEncoder implements IEncoder{
     }
 
     private native byte[] saveEncoding(byte[] data);
+
+    private native byte[] readEncoding(byte[] png);
 
     @Override
     public BufferedImage encode(byte[] data) throws IOException {
@@ -25,7 +28,16 @@ public class JabEncoder implements IEncoder{
     }
 
     @Override
-    public byte[] decode(String filePath) {
-        return new byte[0];
+    public byte[] decode(BufferedImage image) throws IOException{
+//        ByteArrayOutputStream pngStream = new ByteArrayOutputStream();
+//        ImageIO.write(image, "png", pngStream);
+//        byte[] dataStream = readEncoding(pngStream.toByteArray());
+        File fp = new File("/home/daniel/Repos/dissertation/hybrid_arcade/src/test/resources/test/jabcode.png");
+        byte[] fpb = Files.readAllBytes(fp.toPath());
+        byte[] dataStream = readEncoding(fpb);
+        if(dataStream == null){
+            throw new IOException("C Lib fail failed to read JAB code");
+        }
+        return dataStream;
     }
 }

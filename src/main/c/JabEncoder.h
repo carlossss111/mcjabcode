@@ -7,13 +7,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/*
+ * Class:     uk_ac_nottingham_hybridarcade_encoding_JabEncoder
+ * Method:    saveEncoding
+ * Signature: ([B)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
+  (JNIEnv *, jobject, jbyteArray);
 
 /*
  * Class:     uk_ac_nottingham_hybridarcade_encoding_JabEncoder
- * Method:    printJab
- * Signature: ()V
+ * Method:    readEncoding
+ * Signature: ([B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
+JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_readEncoding
   (JNIEnv *, jobject, jbyteArray);
 
 #ifdef __cplusplus

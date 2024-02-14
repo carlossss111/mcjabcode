@@ -24,6 +24,8 @@ jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength){
 	// Generate JABcode
 	int exitCode = generateJABCode(encoding, encodingData);
 	if(exitCode != 0){
+	    printf("C Encode Status: %d\n", exitCode);
+	    fflush(stdout);
 		free(encodingData);
 		destroyEncode(encoding);
 		return NULL;
@@ -44,7 +46,7 @@ JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEnco
   (JNIEnv* env, jobject obj, jbyteArray jStreamIn){
 	
 	// Types: Java -> C
-	jab_byte *streamIn = (*env)->GetByteArrayElements(env, jStreamIn, 0);
+	jab_byte *streamIn = (*env)->GetByteArrayElements(env, jStreamIn, NULL);
 	jab_int32 streamInLength = (*env)->GetArrayLength(env, jStreamIn);
 
 	// Do Work
@@ -60,6 +62,52 @@ JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEnco
 
 	free(png->buffer);
 	free(png);
+	(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
+	return streamOut;
+}
+
+jab_data* myDecode(jab_byte *streamIn, jab_int32 streamInLength) {
+	// Load PNG image from memory to a Bitmap
+	jab_bitmap* bitmap = readImageFromMemory(streamIn, streamInLength);
+	if(!bitmap){
+		return NULL;
+	}
+
+	// Decode bitmap
+	jab_int32 exitCode = 0;
+	jab_decoded_symbol symbols[1];
+	//jab_data* decodeData = decodeJABCodeEx(bitmap, NORMAL_DECODE, &exitCode, symbols, MAX_SYMBOL_NUMBER);
+	jab_data* decodeData = decodeJABCode(bitmap, NORMAL_DECODE, &exitCode);
+	if(exitCode == 3){
+		printf("C Decode Status: %d\n", exitCode);
+		fflush(stdout);
+		free(bitmap);
+		return NULL;
+	}
+
+	free(bitmap);
+	return decodeData;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_readEncoding
+  (JNIEnv* env, jobject obj, jbyteArray jStreamIn) {
+	// Types: Java -> C
+	jab_byte *streamIn = (*env)->GetByteArrayElements(env, jStreamIn, 0);
+	jab_int32 streamInLength = (*env)->GetArrayLength(env, jStreamIn);
+
+	// Do Work
+	jab_data *dataStruct = myDecode(streamIn, streamInLength);
+	if(!dataStruct){
+		(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
+		return NULL;
+	}
+
+	// Types: C -> Java
+	jbyteArray streamOut = (*env)->NewByteArray(env, dataStruct->length);
+	(*env)->SetByteArrayRegion(env, streamOut, 0, dataStruct->length, dataStruct->data);
+
+	free(dataStruct->data);
+	free(dataStruct);
 	(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
 	return streamOut;
 }

@@ -1,6 +1,6 @@
 PREFIX 	=
 CC 	= $(PREFIX)gcc
-CFLAGS	 = -O2 -std=c11 -fPIC
+CFLAGS	 = -O2 -std=c11 -fPIC -D_REENTRANT -D_POSIX_C_SOURCE
 
 INCLUDE_DIRS = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -Isrc/main/c/cinclude
 LINK_DIRS = -Lsrc/main/c/clib

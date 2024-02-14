@@ -9,5 +9,5 @@ public interface IEncoder {
     BufferedImage encode(byte[] data) throws IOException;
 
     // Decode image into bytestream
-    byte[] decode(String filePath);
+    byte[] decode(BufferedImage image) throws IOException;
 }

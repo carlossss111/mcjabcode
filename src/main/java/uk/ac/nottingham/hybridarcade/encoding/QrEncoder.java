@@ -10,7 +10,7 @@ public class QrEncoder implements IEncoder{
     }
 
     @Override
-    public byte[] decode(String filePath) {
+    public byte[] decode(BufferedImage image) {
         return new byte[0];
     }
 }
