@@ -75,10 +75,9 @@ jab_data* myDecode(jab_byte *streamIn, jab_int32 streamInLength) {
 
 	// Decode bitmap
 	jab_int32 exitCode = 0;
-	jab_decoded_symbol symbols[1];
 	//jab_data* decodeData = decodeJABCodeEx(bitmap, NORMAL_DECODE, &exitCode, symbols, MAX_SYMBOL_NUMBER);
-	jab_data* decodeData = decodeJABCode(bitmap, NORMAL_DECODE, &exitCode);
-	if(exitCode == 3){
+	jab_data* decodeData = decodeJABCode(bitmap, COMPATIBLE_DECODE, &exitCode);
+	if(exitCode != 3){
 		printf("C Decode Status: %d\n", exitCode);
 		fflush(stdout);
 		free(bitmap);
@@ -106,7 +105,6 @@ JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEnco
 	jbyteArray streamOut = (*env)->NewByteArray(env, dataStruct->length);
 	(*env)->SetByteArrayRegion(env, streamOut, 0, dataStruct->length, dataStruct->data);
 
-	free(dataStruct->data);
 	free(dataStruct);
 	(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
 	return streamOut;

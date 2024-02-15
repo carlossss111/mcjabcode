@@ -3,17 +3,14 @@ package uk.ac.nottingham.hybridarcade.game;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import uk.ac.nottingham.hybridarcade.Utility;
-import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 
 public class PasteSelection {
     private static final int REFRESH_BLOCKS_CODE = 3;
 
     private BlockState[][][] mBlocks;
-    private BlockConverter mBlockConverter;
 
-    public PasteSelection(BlockConverter blockConverter) {
-        mBlockConverter = blockConverter;
+    public void setBlocks(BlockState[][][] blocks){
+        mBlocks = blocks;
     }
 
     // Paste blocks into the level if stored,
@@ -38,14 +35,5 @@ public class PasteSelection {
         }
 
         return mBlocks.length * mBlocks[0].length * mBlocks[0][0].length;
-    }
-
-    // Scans, returns true if success
-    public boolean scanAndStoreBlocks(){
-
-        // Convert to blocks
-        mBlocks = mBlockConverter.toBlocks(Utility.debugBlockBytes);
-
-        return mBlocks != null;
     }
 }

@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestJabEncoder {
     private static final int ENCODE_MAX = 6797;
     private static final String JABCODE_TEST_PNG = "test/jabcode.png";
+    private static final String JABCODE_INVALID_PNG = "test/notajabcode.png";
 
     JabEncoder mEncoder;
 
@@ -74,12 +75,10 @@ public class TestJabEncoder {
 
     @Test
     public void testEncodeThrowsOnFail(){
-        byte[] streamIn = new byte[ENCODE_MAX + 1000];
+        byte[] streamIn = new byte[ENCODE_MAX + 1];
         Arrays.fill(streamIn, (byte) 'A');
 
-        assertThrows(IOException.class, () -> {
-            mEncoder.encode(streamIn);
-        });
+        assertThrows(IOException.class, () -> mEncoder.encode(streamIn));
     }
 
     @Test
@@ -98,5 +97,21 @@ public class TestJabEncoder {
         assertEquals(65, actualOutput[0]);//A
         assertEquals(66, actualOutput[1]);//B
         assertEquals(67, actualOutput[2]);//C
+    }
+
+    @Test
+    public void testDecodeThrowsOnFail(){
+        BufferedImage inputPNG = null;
+        try {
+            File inputFile = new File(getClass()
+                    .getClassLoader().getResource(JABCODE_INVALID_PNG).getPath());
+            inputPNG = ImageIO.read(inputFile);
+        }
+        catch(Exception e){
+            fail("Problem with the test, jabcode.png not loaded.");
+        }
+
+        BufferedImage finalInputPNG = inputPNG;
+        assertThrows(Exception.class, () -> mEncoder.decode(finalInputPNG));
     }
 }

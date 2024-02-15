@@ -4,9 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class JabEncoder implements IEncoder{
 
@@ -29,12 +27,9 @@ public class JabEncoder implements IEncoder{
 
     @Override
     public byte[] decode(BufferedImage image) throws IOException{
-//        ByteArrayOutputStream pngStream = new ByteArrayOutputStream();
-//        ImageIO.write(image, "png", pngStream);
-//        byte[] dataStream = readEncoding(pngStream.toByteArray());
-        File fp = new File("/home/daniel/Repos/dissertation/hybrid_arcade/src/test/resources/test/jabcode.png");
-        byte[] fpb = Files.readAllBytes(fp.toPath());
-        byte[] dataStream = readEncoding(fpb);
+        ByteArrayOutputStream pngSteam = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", pngSteam);
+        byte[] dataStream = readEncoding(pngSteam.toByteArray());
         if(dataStream == null){
             throw new IOException("C Lib fail failed to read JAB code");
         }

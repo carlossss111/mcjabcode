@@ -7,10 +7,6 @@ import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.entity.player.Player;
 
 public class Utility {
-    // This is a *PLACEHOLDER* for passing blocks from copy to paste
-    // until the game is ready to print and scan cards
-    public static byte[] debugBlockBytes;
-
     // Sends chat globally as the player
     public static void sendChat(String message) {
         Player player =  Minecraft.getInstance().player;

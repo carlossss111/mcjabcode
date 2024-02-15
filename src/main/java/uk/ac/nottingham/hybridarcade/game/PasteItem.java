@@ -12,13 +12,24 @@ import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
+import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
+import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
+    private final BlockConverter mConverter;
+    private final IEncoder mDecoder;
 
     PasteItem() {
         super(new Properties());
-        mPasteSelection = new PasteSelection(BlockConverter.getInstance());
+        mPasteSelection = new PasteSelection();
+        mConverter = BlockConverter.getInstance();
+        mDecoder = new JabEncoder();
     }
 
     @Override
@@ -30,10 +41,15 @@ class PasteItem extends Item implements IForgeItem {
         if(blockState.getBlock().getDescriptionId()
                 .equals(String.format("block.%s.%s", Constants.MOD_ID, Constants.MARKER_BLOCK_ID))) {
 
-            // Paste blocks stored in the paste selection
-            int blocksPasted = mPasteSelection.pasteBlocks(level, pos);
+            // Paste blocks into the world
+            int blocksPasted = mPasteSelection
+                    .pasteBlocks(level, pos);
             if(!level.isClientSide()) {
-                Utility.sendChat("Blocks Pasted: " + blocksPasted);
+                if(blocksPasted == 0){
+                    Utility.sendChat("Failed to paste blocks!");
+                    Constants.logger.warn("0 blocks returned from " +
+                            "PasteSelection#pasteBlocks(...)");
+                }
             }
 
         }
@@ -46,15 +62,36 @@ class PasteItem extends Item implements IForgeItem {
             return InteractionResult.PASS;
         }
 
-        // Scan blocks from scanner
         new Thread(() -> {
             Utility.sendChat("Scanning blocks...");
-            if(mPasteSelection.scanAndStoreBlocks()){
-                Utility.sendChat("Finished scanning and ready to paste.");
+
+            // Scan PNG TODO
+            BufferedImage barcodePNG;
+            try{
+                File inputFile = new File(getClass()
+                        .getClassLoader().getResource("mockinput.png").getPath());
+                barcodePNG = ImageIO.read(inputFile);
             }
-            else{
-                Utility.sendChat("Failed to scan! Try again.");
+            catch(IOException | NullPointerException e){
+                Utility.sendChat("Failed to scan encoding!");
+                Constants.logger.error("IEncoder#decode(bytes) threw an Exception\n" + e);
+                return;
             }
+
+            // Read bytes from PNG TODO
+            byte[] blocksAsBytestream = null;
+            try{
+                blocksAsBytestream = mDecoder.decode(barcodePNG);
+            }
+            catch(IOException e){
+                Utility.sendChat("Failed to decode encoding!");
+                Constants.logger.error("IEncoder#decode(bytes) threw an IOException\n" + e);
+                return;
+            }
+
+            // Set blocks ready for pasting
+            mPasteSelection.setBlocks(mConverter.toBlocks(blocksAsBytestream));
+
         }).start();
 
         return InteractionResult.PASS;
