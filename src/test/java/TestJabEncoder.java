@@ -11,7 +11,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJabEncoder {
-    private static final int ENCODE_MAX = 6796;
+    private static final int ENCODE_MAX = 6797;
     private static final String JABCODE_TEST_PNG = "test/jabcode.png";
 
     JabEncoder mEncoder;
@@ -43,7 +43,7 @@ public class TestJabEncoder {
     @Test
     public void testEncodeIsCorrect() throws IOException{
         BufferedImage expectedPNG = null;
-        BufferedImage actualPNG = null;
+        BufferedImage actualPNG;
         try {
             File expectedFile = new File(getClass()
                     .getClassLoader().getResource(JABCODE_TEST_PNG).getPath());
@@ -58,7 +58,6 @@ public class TestJabEncoder {
         streamIn[1] = 66;//B
         streamIn[2] = 67;//C
         actualPNG = mEncoder.encode(streamIn);
-        ImageIO.write(actualPNG, "png", new File("test.png"));
 
         assertNotNull(actualPNG);
         assertTrue(areImagesTheSame(expectedPNG, actualPNG));
@@ -66,21 +65,16 @@ public class TestJabEncoder {
 
     @Test
     public void testEncodeCanTakeMaxValue() throws IOException{
-        BufferedImage png;
-
-        //byte[] streamIn = new byte[4138];
         byte[] streamIn = new byte[ENCODE_MAX];
         Arrays.fill(streamIn, (byte) 'A');
 
-        png = mEncoder.encode(streamIn);
+        BufferedImage png = mEncoder.encode(streamIn);
         assertNotNull(png);
     }
 
     @Test
     public void testEncodeThrowsOnFail(){
-        BufferedImage png;
-
-        byte[] streamIn = new byte[ENCODE_MAX + 1];
+        byte[] streamIn = new byte[ENCODE_MAX + 1000];
         Arrays.fill(streamIn, (byte) 'A');
 
         assertThrows(IOException.class, () -> {

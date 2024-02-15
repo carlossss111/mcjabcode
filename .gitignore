@@ -4,6 +4,7 @@
 .vscode/
 
 # Build Dirs
+bin/
 build/
 run/
 logs/
