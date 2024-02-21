@@ -14,22 +14,24 @@ import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
+import uk.ac.nottingham.hybridarcade.hardware.Scanner;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpClient;
 
 class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
     private final BlockConverter mConverter;
     private final IEncoder mDecoder;
+    private final Scanner mScanner;
 
     PasteItem() {
         super(new Properties());
         mPasteSelection = new PasteSelection();
         mConverter = BlockConverter.getInstance();
         mDecoder = new JabEncoder();
+        mScanner = new Scanner(HttpClient.newHttpClient());
     }
 
     @Override
@@ -65,21 +67,19 @@ class PasteItem extends Item implements IForgeItem {
         new Thread(() -> {
             Utility.sendChat("Scanning blocks...");
 
-            // Scan PNG TODO
+            // Scan PNG
             BufferedImage barcodePNG;
             try{
-                File inputFile = new File(getClass()
-                        .getClassLoader().getResource("mockinput.png").getPath());
-                barcodePNG = ImageIO.read(inputFile);
+                barcodePNG = mScanner.scan();
             }
-            catch(IOException | NullPointerException e){
+            catch(IOException e){
                 Utility.sendChat("Failed to scan encoding!");
-                Constants.logger.error("IEncoder#decode(bytes) threw an Exception\n" + e);
+                Constants.logger.error("Scanner#scan() threw an IOException\n" + e);
                 return;
             }
 
-            // Read bytes from PNG TODO
-            byte[] blocksAsBytestream = null;
+            // Read bytes from PNG
+            byte[] blocksAsBytestream;
             try{
                 blocksAsBytestream = mDecoder.decode(barcodePNG);
             }
@@ -89,11 +89,12 @@ class PasteItem extends Item implements IForgeItem {
                 return;
             }
 
-            // Set blocks ready for pasting
+            // Convert bytes to blocktypes and save
             mPasteSelection.setBlocks(mConverter.toBlocks(blocksAsBytestream));
 
         }).start();
 
+        Utility.sendChat("Finished!");
         return InteractionResult.PASS;
     }
 }

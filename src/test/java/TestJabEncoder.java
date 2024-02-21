@@ -13,32 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestJabEncoder {
     private static final int ENCODE_MAX = 6797;
     private static final String JABCODE_TEST_PNG = "test/jabcode.png";
-    private static final String JABCODE_INVALID_PNG = "test/notajabcode.png";
+    private static final String JABCODE_INVALID_PNG = "test/unreadable.png";
 
     JabEncoder mEncoder;
 
     @BeforeEach
     public void setup() {
         mEncoder = new JabEncoder();
-    }
-
-    public boolean areImagesTheSame(BufferedImage imageA, BufferedImage imageB){
-        int width  = imageA.getWidth();
-        int height = imageA.getHeight();
-
-        if(width != imageB.getWidth() || height != imageB.getHeight()){
-            return false;
-        }
-
-        // Compare every pixel in the image
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                if(imageA.getRGB(x,y) != imageB.getRGB(x,y)){
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Test
@@ -61,7 +42,7 @@ public class TestJabEncoder {
         actualPNG = mEncoder.encode(streamIn);
 
         assertNotNull(actualPNG);
-        assertTrue(areImagesTheSame(expectedPNG, actualPNG));
+        assertTrue(Utility.areImagesTheSame(expectedPNG, actualPNG));
     }
 
     @Test
@@ -112,6 +93,6 @@ public class TestJabEncoder {
         }
 
         BufferedImage finalInputPNG = inputPNG;
-        assertThrows(Exception.class, () -> mEncoder.decode(finalInputPNG));
+        assertThrows(IOException.class, () -> mEncoder.decode(finalInputPNG));
     }
 }
