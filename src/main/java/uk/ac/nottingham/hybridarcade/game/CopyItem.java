@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.compression.ICompressor;
+import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
@@ -24,12 +26,14 @@ class CopyItem extends Item implements IForgeItem {
     private final CopySelection mCopySelection;
     private final BlockConverter mConverter;
     private final IEncoder mEncoder;
+    private final ICompressor mCompressor;
 
     CopyItem() {
         super(new Item.Properties());
         mCopySelection = new CopySelection();
         mConverter = BlockConverter.getInstance();
         mEncoder = new JabEncoder();
+        mCompressor = new RunLengthCompressor();
     }
 
     @Override
@@ -75,12 +79,15 @@ class CopyItem extends Item implements IForgeItem {
             }
 
             // Store the blocks as a stream of bytes according to the mapping
-            byte[] blocksAsBytestream = mConverter.toBytes(mCopySelection.getBlocks());
+            byte[] convertedBytes = mConverter.toBytes(mCopySelection.getBlocks());
+
+            // Compress bytestream
+            byte[] compressedBytes = mCompressor.compress(convertedBytes);
 
             // Get the blocks as a barcode PNG image
             BufferedImage barcodePNG;
             try {
-                barcodePNG = mEncoder.encode(blocksAsBytestream);
+                barcodePNG = mEncoder.encode(compressedBytes);
             }
             catch(IOException e){
                 Utility.sendChat("Failed to generate encoding!");

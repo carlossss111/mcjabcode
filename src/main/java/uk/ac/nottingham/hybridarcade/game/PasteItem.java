@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.compression.ICompressor;
+import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
@@ -24,6 +26,7 @@ class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
     private final BlockConverter mConverter;
     private final IEncoder mDecoder;
+    private final ICompressor mDecompressor;
     private final Scanner mScanner;
 
     PasteItem() {
@@ -32,6 +35,7 @@ class PasteItem extends Item implements IForgeItem {
         mConverter = BlockConverter.getInstance();
         mDecoder = new JabEncoder();
         mScanner = new Scanner(HttpClient.newHttpClient());
+        mDecompressor = new RunLengthCompressor();
     }
 
     @Override
@@ -79,9 +83,9 @@ class PasteItem extends Item implements IForgeItem {
             }
 
             // Read bytes from PNG
-            byte[] blocksAsBytestream;
+            byte[] decodedBytes;
             try{
-                blocksAsBytestream = mDecoder.decode(barcodePNG);
+                decodedBytes = mDecoder.decode(barcodePNG);
             }
             catch(IOException e){
                 Utility.sendChat("Failed to decode encoding!");
@@ -89,8 +93,19 @@ class PasteItem extends Item implements IForgeItem {
                 return;
             }
 
+            // Decompress bytes
+            byte[] rawBytes;
+            try{
+                rawBytes = mDecompressor.decompress(decodedBytes);
+            }
+            catch(IllegalArgumentException e){
+                Utility.sendChat("Failed to decompress encoding!");
+                Constants.logger.error("ICompressor#decompress(bytes) threw an IllegalArgumentException\n" + e);
+                return;
+            }
+
             // Convert bytes to blocktypes and save
-            mPasteSelection.setBlocks(mConverter.toBlocks(blocksAsBytestream));
+            mPasteSelection.setBlocks(mConverter.toBlocks(rawBytes));
 
         }).start();
 
