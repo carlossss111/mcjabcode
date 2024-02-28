@@ -23,7 +23,7 @@ so that they work within the Java Native Interface (JNI).
 
 #### Libz
 * Download and extract the latest version: https://www.zlib.net/. 
-* Edit the `Makefile` so that the CFLAGS and SFLAGs contain the correct:
+* Edit the `Makefile` so that the CFLAGS and SFLAGs contain the following:
 ```makefile
 CFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN -D_REENTRANT -D_POSIX_C_SOURCE
 SFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN -D_REENTRANT -D_POSIX_C_SOURCE
@@ -114,6 +114,13 @@ The encoding using the House's data:
 The house replicated somewhere entirely new by scanning the encoding:
 
 ![Pasted House][paste_image]
+
+## Javadocs
+Generate javadocs to the `docs/` directory with
+```
+./gradlew javadoc
+```
+and open in a web browser.
 
 ## Authors
 Written by: Daniel Robinson / psydr2@nottingham.ac.uk

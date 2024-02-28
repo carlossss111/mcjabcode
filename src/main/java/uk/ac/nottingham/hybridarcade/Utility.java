@@ -6,8 +6,16 @@ import net.minecraft.network.chat.OutgoingChatMessage;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.entity.player.Player;
 
+/**
+ * Global Utilities
+ * @author Daniel Robinson
+ */
 public class Utility {
-    // Sends chat globally as the player
+
+    /**
+     * Sends a chat message as the player
+     * @param message The string to be displayed in-game.
+     */
     public static void sendChat(String message) {
         Player player =  Minecraft.getInstance().player;
         if(player == null){

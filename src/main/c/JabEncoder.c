@@ -1,3 +1,7 @@
+/*
+* Author: Daniel Robinson 2024
+*/
+
 #include "JabEncoder.h"
 
 #include <stdio.h>

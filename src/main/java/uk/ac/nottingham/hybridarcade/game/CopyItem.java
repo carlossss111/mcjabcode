@@ -22,12 +22,31 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Item that copies blocks from the world and stores them as an encoding.
+ * When the player left-clicks on a Marker Block, it's position will be added to
+ * {@link CopySelection} according it's constraints.
+ * When the player right-clicks on any block, the blocks stored between the
+ * {@link CopySelection} coordinates will be saved as an encoding.
+ * <br/><br/>
+ * Conceptually, CopyItem is a Controller in the Model-View-Controller pattern.
+ * @see CopySelection
+ * @see IEncoder
+ * @see ICompressor
+ * @see BlockConverter
+ * @author Daniel Robinson 2024
+ */
 class CopyItem extends Item implements IForgeItem {
+    private final static String SAVED_PNG_NAME = "barcode.png";
+
     private final CopySelection mCopySelection;
     private final BlockConverter mConverter;
     private final IEncoder mEncoder;
     private final ICompressor mCompressor;
 
+    /**
+     * Constructor instantiates each part of the model.
+     */
     CopyItem() {
         super(new Item.Properties());
         mCopySelection = new CopySelection();
@@ -36,6 +55,15 @@ class CopyItem extends Item implements IForgeItem {
         mCompressor = new RunLengthCompressor();
     }
 
+    /**
+     * Called by the Server Thread upon left-clicking while holding the item.
+     * Adds the position of the block hit into {@link CopySelection}. The block
+     * must be the Marker Block.
+     * @param itemstack The current ItemStack
+     * @param pos       Block's position in world
+     * @param player    The Player that is wielding the item
+     * @return Always True so that the block is not harvested.
+     */
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, Player player) {
         Level level = player.level();
@@ -62,6 +90,18 @@ class CopyItem extends Item implements IForgeItem {
         return true;
     }
 
+    /**
+     * Called by the Server Thread upon right-clicking while holding the item.
+     * Tries each part of the MVC Model sequentially in a newly spawned Thread: <br/>
+     * Copies the blocks between the {@link CopySelection} coordinates; converts
+     * them into bytes using a map; compresses them; generates an encoding; and
+     * saves it to disk.<br/>
+     * Any errors thrown by the model are caught here and an error message is returned to the
+     * player and the logger so that the game can continue without crashing.
+     * @param stack The current ItemStack
+     * @param context The Item's Context
+     * @return Always True so that interaction did not hold errors
+     */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if(context.getLevel().isClientSide()){
@@ -95,15 +135,15 @@ class CopyItem extends Item implements IForgeItem {
                 return;
             }
 
-            // Print out the barcodePNG TODO
+            // Print out the barcodePNG
             try {
-                File outputFile = new File("barcode.png");
+                File outputFile = new File(SAVED_PNG_NAME);
                 ImageIO.write(barcodePNG, "png", outputFile);
                 Utility.sendChat("Saved as " + outputFile.getPath());
             }
             catch(IOException e){
                 Utility.sendChat("Failed to print out encoding!");
-                Constants.logger.error("W.I.P.");
+                Constants.logger.error("ImageIO#write() threw an IOException\n" + e);
                 return;
             }
 

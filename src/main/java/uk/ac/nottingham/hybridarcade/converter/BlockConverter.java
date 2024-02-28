@@ -18,6 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Converts a 3-dimensional array of blocks into an array of Bytes and visa versa.
+ * This class uses a mapping of blocks to byte values (0-255) to do the conversion.
+ * <br/><br/>See also: resources/converter/blockmap256.json
+ * @author Daniel Robinson 2024
+ */
 public class BlockConverter {
     private static final String BLOCKMAP_PATH = "converter/blockmap256.json";
     private static final String PLACEHOLDER_BLOCK = "block.minecraft.air";
@@ -34,12 +40,16 @@ public class BlockConverter {
         return instance;
     }
 
-    // Constructor initializes the map from the resources directory
-    // This maps the block name e.g. 'block.cobblestone' to a number.
+    /**
+     * Constructor loads the BlockMap from disk into memory as a hashmap. It also
+     * stores an inverted version of the map.
+     * @see #invertMap(Map) 
+     */
     private BlockConverter() {
         try {
             String path = getClass().getClassLoader().getResource(BLOCKMAP_PATH).getPath();
-            if(path.split("%.*!").length > 1) { // I don't know why but a weird substring gets inserted and needs to be removed, e.g. "%124!"
+            // I don't know why but a weird substring gets inserted and needs to be removed, e.g. "%124!"
+            if(path.split("%.*!").length > 1) {
                 path = path.split("%.*!")[0] + path.split("%.*!")[1];
             }
             Reader reader = Files.newBufferedReader(Path.of(path));
@@ -54,17 +64,26 @@ public class BlockConverter {
         }
     };
 
-    //Getters
+    /**
+     * Gets the block map as a hashmap.
+     */
     public HashMap<String, Byte> getBlockMap() {
         return mBlockMap;
     }
 
+    /**
+     * Gets the block map as an inverted hashmap.
+     */
     public HashMap<Byte, String> getBlockMapInverted() {
         return mBlockMapInverted;
     }
 
 
-    // Inverts map so that the original key is now the value etc.
+    /**
+     * Inverts the map such that each key is now the value and visa versa.
+     * @param map The map to invert
+     * @return The inverted map
+     */
     private  <K, V> Map<V, K> invertMap(Map<K, V> map) {
         return map.entrySet()
                 .stream().collect(
@@ -76,7 +95,12 @@ public class BlockConverter {
                 );
     }
 
-    // Convert blocks into a bytestream
+    /**
+     * Converts a 3-dimensional array of blocks into a Byte array using the
+     * block map.
+     * @param blocks 3-dimensional array of game blocks to convert.
+     * @return Array of mapped bytes.
+     */
     public byte[] toBytes(BlockState[][][] blocks){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -103,7 +127,12 @@ public class BlockConverter {
         return stream.toByteArray();
     }
 
-    // Convert bytestream into blocks
+    /**
+     * Converts an array of Bytes into a 3-dimensional array of blocks using
+     * the block map.
+     * @param bytes Bytes to convert.
+     * @return 3-dimensional array of game blocks mapped from bytes.
+     */
     public BlockState[][][] toBlocks(byte[] bytes){
         ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
 

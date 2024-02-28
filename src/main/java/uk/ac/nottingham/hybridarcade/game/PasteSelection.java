@@ -1,20 +1,37 @@
 package uk.ac.nottingham.hybridarcade.game;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
+/**
+ * Holds a 3 dimensional array of {@link BlockState BlockStates} and places them into the world
+ * at a given position.
+ * @author Daniel Robinson 2024
+ */
 public class PasteSelection {
     private static final int REFRESH_BLOCKS_CODE = 3;
 
     private BlockState[][][] mBlocks;
 
+    /**
+     * Set the block selection.
+     * @param blocks 3D array of BlockStates.
+     */
     public void setBlocks(BlockState[][][] blocks){
         mBlocks = blocks;
     }
 
-    // Paste blocks into the level if stored,
-    // should be called on BOTH the renderer and server Thread.
+    /**
+     * Paste the blocks set by {@link PasteSelection#setBlocks(BlockState[][][]) setBlocks()}
+     * into the game world at the given position.
+     * This method should be called from <b>BOTH</b> the renderer and server Thread.
+     * @param level The current level returned by {@link Player#level()}
+     * @param startMarker The block position from where to paste the blocks from.
+     * @return The number of blocks pasted. If there is an error
+     * then 0 will be returned instead of throwing an error.
+     */
     public int pasteBlocks(LevelAccessor level, BlockPos startMarker) {
         // Validation
         if (mBlocks == null){

@@ -22,6 +22,21 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.http.HttpClient;
 
+/**
+ * Item that scans blocks and pastes them into the world.
+ * When the player right-clicks on any block, an encoding will be read and saved in
+ * {@link PasteSelection}.
+ * When the player left-clicks on a Marker Block, then the blocks stored in {@link PasteSelection}
+ * will be pasted into the world at the position of the marker.
+ * <br/><br/>
+ * Conceptually, PasteItem is a Controller in the Model-View-Controller pattern.
+ * @see PasteSelection
+ * @see Scanner
+ * @see IEncoder
+ * @see ICompressor
+ * @see BlockConverter
+ * @author Daniel Robinson 2024
+ */
 class PasteItem extends Item implements IForgeItem {
     private final PasteSelection mPasteSelection;
     private final BlockConverter mConverter;
@@ -29,6 +44,9 @@ class PasteItem extends Item implements IForgeItem {
     private final ICompressor mDecompressor;
     private final Scanner mScanner;
 
+    /**
+     * Constructor instantiates a copy of each part of the Model.
+     */
     PasteItem() {
         super(new Properties());
         mPasteSelection = new PasteSelection();
@@ -38,6 +56,15 @@ class PasteItem extends Item implements IForgeItem {
         mDecompressor = new RunLengthCompressor();
     }
 
+    /**
+     * Called twice by the Renderer Thread and Server Thread upon left-clicking
+     * while holding the item. Pastes the blocks stored in {@link PasteSelection} into
+     * the given position. The block left-clicked on must be the Marker Block.
+     * @param itemstack The current ItemStack
+     * @param pos       Block's position in world
+     * @param player    The Player that is wielding the item
+     * @return Always True to prevent block being harvested
+     */
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, Player player) {
         Level level = player.level();
@@ -56,12 +83,26 @@ class PasteItem extends Item implements IForgeItem {
                     Constants.logger.warn("0 blocks returned from " +
                             "PasteSelection#pasteBlocks(...)");
                 }
+                else{
+                    Utility.sendChat("Blocks pasted: " + blocksPasted);
+                }
             }
 
         }
         return true;
     }
 
+    /**
+     * Called on the Server Thread by right-clicking any block while holding the Paste Item.
+     * Tries each part of the MVC Model sequentially in a newly spawned thread:<br/>
+     * Scans the barcode; decodes it into bytes; decompresses it; converts it
+     * to {@link BlockState BlockStates} using a map; and spawns it into the game view.<br/>
+     * Any errors thrown by the model are caught here and an error message is returned to the
+     * player and the logger so that the game can continue without crashing.
+     * @param stack The current ItemStack
+     * @param context The Item's Context
+     * @return Always True so that interaction did not hold errors
+     */
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if(context.getLevel().isClientSide()){
@@ -104,7 +145,7 @@ class PasteItem extends Item implements IForgeItem {
                 return;
             }
 
-            // Convert bytes to blocktypes and save
+            // Convert bytes to blocktypes and paste
             mPasteSelection.setBlocks(mConverter.toBlocks(rawBytes));
 
             Utility.sendChat("Finished!");

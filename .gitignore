@@ -8,6 +8,7 @@ bin/
 build/
 run/
 logs/
+docs/
 
 # Other
 *.old

@@ -4,12 +4,25 @@ import uk.ac.nottingham.hybridarcade.Constants;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Compresses/decompresses a byte array to/from a short byte array using simple
+ * Run Length Compression.
+ * @author Daniel Robinson 2024
+ */
 public class RunLengthCompressor implements ICompressor{
     private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
 
+    /**
+     * Compresses a chunk of bytes that are the same value. The compressed array
+     * starts with a 'RL' token to indicate compression, then the number of bytes (0-255)
+     * compressed, then the byte value. <br/>E.g. <code>'[RL][4][A] == AAAA'</code><br/>
+     * A sequence of less than 4 bytes is not compressed. A sequence of more than 256 bytes
+     * is compressed into multiple parts.
+     * @param byteChunk Array of bytes where all bytes are the same value.
+     * @param size Size of byteChunk.
+     * @return Array of compressed bytes.
+     */
     private byte[] convertToRunlength(byte[] byteChunk, int size){
-        // compress with RL flag, followed by the number of bytes, followed by byte type
-        // e.g. [RL][4][A] == AAAA
         ByteArrayOutputStream rlChunk = new ByteArrayOutputStream();
         do{
             // at lengths less than 4, there is no profit from RL compression
@@ -28,12 +41,19 @@ public class RunLengthCompressor implements ICompressor{
         return rlChunk.toByteArray();
     }
 
+    /**
+     * Compresses an array of bytes into a shorter array of bytes with run-length
+     * compression.
+     * @param rawBytes Bytes to compress.
+     * @return Compressed Byte Array.
+     * @see #convertToRunlength(byte[], int) 
+     */
     @Override
     public byte[] compress(byte[] rawBytes) {
         ByteArrayOutputStream compressedBytes = new ByteArrayOutputStream();
         ByteArrayOutputStream byteChunk = new ByteArrayOutputStream();
         for(int i = 0; i < rawBytes.length; i++){
-            /**
+            /*
              * If byte i is the same as last, write it into the chunk
              * if it is different or we have reached the end, copy the chunk and write into a fresh one
              */
@@ -41,7 +61,7 @@ public class RunLengthCompressor implements ICompressor{
                 compressedBytes.writeBytes(
                         convertToRunlength(byteChunk.toByteArray(), byteChunk.size())
                 );
-                byteChunk.reset();;
+                byteChunk.reset();
             }
             byteChunk.write(rawBytes[i]);
         }
@@ -52,6 +72,12 @@ public class RunLengthCompressor implements ICompressor{
         return  compressedBytes.toByteArray();
     }
 
+    /**
+     * Decompresses a byte array of run-length bytes into the original byte array.
+     * @param compressedBytes Compressed Bytes to decompress.
+     * @return Original array of bytes
+     * @throws IllegalArgumentException if compressedBytes is not a valid compression.
+     */
     @Override
     public byte[] decompress(byte[] compressedBytes) throws IllegalArgumentException{
         ByteArrayOutputStream rawBytes = new ByteArrayOutputStream();

@@ -31,8 +31,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Important for reading the C libraries
-            // TODO: change to relative path
-            property 'java.library.path', '/home/daniel/Repos/dissertation/hybrid_arcade/src/main/resources/encoding'
+            property 'java.library.path', "${projectDir}/src/main/resources/encoding"
 
             mods {
                 "${mod_id}" {
@@ -147,4 +146,8 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+javadoc {
+    destinationDir = file("${projectDir}/docs/")
 }

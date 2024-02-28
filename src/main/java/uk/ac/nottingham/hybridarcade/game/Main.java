@@ -15,6 +15,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import uk.ac.nottingham.hybridarcade.Constants;
 
+/**
+ * Called on loading of the Hybrid_Arcade mod. This is loads the custom items
+ * into registries so that they can be loaded into the game.
+ * @author Daniel Robinson 2024
+ */
 @Mod(Constants.MOD_ID)
 public class Main {
     // Registries
@@ -45,7 +50,10 @@ public class Main {
     static final RegistryObject<Item> PASTE_WAND
             = ITEMS.register(Constants.PASTE_WAND_ID, PasteItem::new);
 
-    // Called before anything else when the mod is loaded
+    /**
+     * Called on loading of the mod. Registers all custom blocks and items.
+     * Registers the ModEventHandlers
+     */
     public Main() {
         final IEventBus modEventBus = FMLJavaModLoadingContext
                 .get().getModEventBus();
