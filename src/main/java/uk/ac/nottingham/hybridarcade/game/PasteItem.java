@@ -107,9 +107,9 @@ class PasteItem extends Item implements IForgeItem {
             // Convert bytes to blocktypes and save
             mPasteSelection.setBlocks(mConverter.toBlocks(rawBytes));
 
+            Utility.sendChat("Finished!");
         }).start();
 
-        Utility.sendChat("Finished!");
         return InteractionResult.PASS;
     }
 }

@@ -120,7 +120,12 @@ public class BlockConverter {
                 for (int k = 0; k < k_length; k++){
                     byte blockByte = (byte) stream.read();
                     String blockId = mBlockMapInverted.get(blockByte);
-                    blockId = String.format("%s:%s", blockId.split("\\.")[1], blockId.split("\\.")[2]);
+                    if(blockId != null && blockId != "RESERVED") {
+                        blockId = String.format("%s:%s", blockId.split("\\.")[1], blockId.split("\\.")[2]);
+                    }
+                    else{
+                        blockId = "minecraft:air";
+                    }
                     blocks[i][j][k] = ForgeRegistries.BLOCKS.getValue(
                             ResourceLocation.tryParse(blockId)
                     ).defaultBlockState();

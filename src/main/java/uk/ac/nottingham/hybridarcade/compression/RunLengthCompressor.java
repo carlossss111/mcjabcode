@@ -1,9 +1,11 @@
 package uk.ac.nottingham.hybridarcade.compression;
 
+import uk.ac.nottingham.hybridarcade.Constants;
+
 import java.io.ByteArrayOutputStream;
 
 public class RunLengthCompressor implements ICompressor{
-    private final static byte RL = (byte) 255; //indicates the start of 3 compressed bytes
+    private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
 
     private byte[] convertToRunlength(byte[] byteChunk, int size){
         // compress with RL flag, followed by the number of bytes, followed by byte type

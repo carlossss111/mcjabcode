@@ -14,7 +14,8 @@ public class TestBlockConverter {
      * {
      *   "block.minecraft.air":            0,
      *   "block.minecraft.stone":          1,
-     *   "block.minecraft.grass_block":    2
+     *   "block.minecraft.grass_block":    2,
+     *   "RESERVED":                       255 //<-- For RunLengthCompression
      * }
      */
 
@@ -30,9 +31,10 @@ public class TestBlockConverter {
         Map<String, Byte> targetMap =
                 Map.of( "block.minecraft.air",          (byte) 0,
                         "block.minecraft.stone",        (byte) 1,
-                        "block.minecraft.grass_block",  (byte) 2
+                        "block.minecraft.grass_block",  (byte) 2,
+                        "RESERVED",                     (byte) 255
                 );
-        assertEquals(3, blockMap.size());
+        assertEquals(4, blockMap.size());
         assertEquals(targetMap, blockMap);
     }
 
@@ -43,9 +45,10 @@ public class TestBlockConverter {
         Map<Byte, String> targetMap =
                 Map.of( (byte) 0, "block.minecraft.air",
                         (byte) 1, "block.minecraft.stone",
-                        (byte) 2, "block.minecraft.grass_block"
+                        (byte) 2, "block.minecraft.grass_block",
+                        (byte) 255, "RESERVED"
                 );
-        assertEquals(3, blockMap.size());
+        assertEquals(4, blockMap.size());
         assertEquals(targetMap, blockMap);
     }
 }

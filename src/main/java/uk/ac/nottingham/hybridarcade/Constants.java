@@ -12,5 +12,8 @@ public class Constants {
     public static final String COPY_WAND_ID = "copy_wand";
     public static final String PASTE_WAND_ID = "paste_wand";
 
+    public static final byte RESERVED_FOR_COMPRESSION_TK = (byte) 255;
+    public static final String RESERVED_KEYWORD = "RESERVED";
+
     public static final String SCANNER_URI = "http://raspberrypi.local:5000";
 }

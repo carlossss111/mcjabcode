@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 
 import java.nio.charset.StandardCharsets;
@@ -7,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRunLengthCompressor {
-    private final static byte RL = (byte) 255;
+    private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
 
     RunLengthCompressor mCompressor;
 
