@@ -97,7 +97,9 @@ class CopyItem extends Item implements IForgeItem {
 
             // Print out the barcodePNG TODO
             try {
-                ImageIO.write(barcodePNG, "png", new File("mockoutput.png"));
+                File outputFile = new File("barcode.png");
+                ImageIO.write(barcodePNG, "png", outputFile);
+                Utility.sendChat("Saved as " + outputFile.getPath());
             }
             catch(IOException e){
                 Utility.sendChat("Failed to print out encoding!");

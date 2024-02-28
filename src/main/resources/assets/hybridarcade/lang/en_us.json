@@ -1,6 +1,6 @@
 {
-  "item.hybridarcade.copy_wand" : "Red Magic Wand",
-  "item.hybridarcade.paste_wand" : "Blue Magic Wand",
+  "item.hybridarcade.copy_wand" : "Copy Wand",
+  "item.hybridarcade.paste_wand" : "Paste Wand",
   "item.hybridarcade.marker_block_item" : "Marker",
   "block.hybridarcade.marker_block" : "Marker"
 }
