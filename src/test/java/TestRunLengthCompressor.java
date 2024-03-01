@@ -1,16 +1,20 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.Constants;
+import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRunLengthCompressor {
     private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
+    private final static String TEST_PATH = "test/rawRL.bytes";
 
-    RunLengthCompressor mCompressor;
+    ICompressor mCompressor;
 
     private static void assertByteArrayEquals(byte[] expected, byte[] actual){
         if(expected.length != actual.length){
@@ -98,5 +102,15 @@ public class TestRunLengthCompressor {
         byte[] testInput2 = {'A','A', RL};
         assertThrows(IllegalArgumentException.class, () -> mCompressor.decompress(testInput));
         assertThrows(IllegalArgumentException.class, () -> mCompressor.decompress(testInput2));
+    }
+
+    @Test
+    public void testSignByteBug() throws Exception {
+        File fp = new File(getClass()
+                .getClassLoader().getResource(TEST_PATH).getPath());
+        byte[] rawBytes = Files.readAllBytes(fp.toPath());
+        byte[] compressedBytes = mCompressor.compress(rawBytes);
+        byte[] decompressedBytes = mCompressor.decompress(compressedBytes);
+        assertByteArrayEquals(rawBytes, decompressedBytes);
     }
 }

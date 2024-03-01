@@ -149,11 +149,16 @@ public class BlockConverter {
                 for (int k = 0; k < k_length; k++){
                     byte blockByte = (byte) stream.read();
                     String blockId = mBlockMapInverted.get(blockByte);
-                    if(blockId != null && blockId != "RESERVED") {
-                        blockId = String.format("%s:%s", blockId.split("\\.")[1], blockId.split("\\.")[2]);
+                    if(blockId.equals(Constants.RESERVED_KEYWORD)){
+                        Constants.logger.warn("Byte reserved for compression found in block converter.");
+                        blockId = "minecraft:air";
+                    }
+                    else if(blockId == null){
+                        Constants.logger.warn("Unmapped byte found in block converter.");
+                        blockId = "minecraft:air";
                     }
                     else{
-                        blockId = "minecraft:air";
+                        blockId = String.format("%s:%s", blockId.split("\\.")[1], blockId.split("\\.")[2]);
                     }
                     blocks[i][j][k] = ForgeRegistries.BLOCKS.getValue(
                             ResourceLocation.tryParse(blockId)

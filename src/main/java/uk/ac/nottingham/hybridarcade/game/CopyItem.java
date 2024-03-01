@@ -148,6 +148,7 @@ class CopyItem extends Item implements IForgeItem {
             }
 
             // Confirm
+            Utility.sendChat("Bytes Stored: " + compressedBytes.length);
             Utility.sendChat("Blocks Copied: " + blocksStored);
         }).start();
 

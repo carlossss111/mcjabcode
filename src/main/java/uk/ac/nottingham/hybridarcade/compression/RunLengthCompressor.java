@@ -92,7 +92,13 @@ public class RunLengthCompressor implements ICompressor{
                 }
 
                 // Decompresses and moves the pointer along
-                byte runLengthNum = compressedBytes[i+1];
+                int runLengthNum;
+                if(compressedBytes[i+1] < 0){
+                    runLengthNum = (int) compressedBytes[i+1] + 256;
+                }
+                else{
+                    runLengthNum = compressedBytes[i+1];
+                }
                 byte runLengthChar = compressedBytes[i+2];
                 for(int j = 0; j < runLengthNum; j++){
                     rawBytes.write(runLengthChar);
