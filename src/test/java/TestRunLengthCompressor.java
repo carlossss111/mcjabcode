@@ -71,13 +71,13 @@ public class TestRunLengthCompressor {
 
     @Test
     public void testCompressionVeryLong(){
-        byte[] testInput = new byte[514];
+        byte[] testInput = new byte[512];
         //A*513, B
         for(int i = 0; i < 512; i++){
             testInput[i] = 'A';
         }
-        testInput[512] = 'A';
-        testInput[513] = 'B';
+        testInput[510] = 'A';
+        testInput[511] = 'B';
 
         byte[] testOutput = mCompressor.compress(testInput);
 
@@ -98,7 +98,7 @@ public class TestRunLengthCompressor {
 
     @Test
     public void testDecompressionThrowsAtInvalid(){
-        byte[] testInput = {RL, RL, 'A'};
+        byte[] testInput = {RL, RL, RL};
         byte[] testInput2 = {'A','A', RL};
         assertThrows(IllegalArgumentException.class, () -> mCompressor.decompress(testInput));
         assertThrows(IllegalArgumentException.class, () -> mCompressor.decompress(testInput2));

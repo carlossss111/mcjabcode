@@ -35,7 +35,7 @@ public class RunLengthCompressor implements ICompressor{
             rlChunk.write(RL);
             rlChunk.write(Math.min(size, 255));
             rlChunk.write(byteChunk[0]);
-            size -= 256;
+            size -= 255;
         }while(size > 0);
 
         return rlChunk.toByteArray();
@@ -85,7 +85,6 @@ public class RunLengthCompressor implements ICompressor{
             if(compressedBytes[i] == RL){
                 // Validation
                 if(i + 2 >= compressedBytes.length
-                        || compressedBytes[i+1] == RL
                         || compressedBytes[i+2] == RL){
                     throw new IllegalArgumentException(
                             "The bytestream being decompressed is not a valid compression!");
