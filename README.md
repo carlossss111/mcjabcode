@@ -78,6 +78,9 @@ The webserver can be started with e.g.
 flask --app scanner.py run --host=0.0.0.0
 ```
 
+### Setting up the Printer
+The game uses the system print drivers and a connected printer, there is no configuration needed.
+
 ## Running the Game Client
 Given that the C library is compiled, tests can be run with
 ```

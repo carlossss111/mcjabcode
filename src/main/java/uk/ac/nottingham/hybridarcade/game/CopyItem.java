@@ -16,10 +16,11 @@ import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
+import uk.ac.nottingham.hybridarcade.hardware.Printer;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.IOException;
 
 /**
@@ -43,6 +44,7 @@ class CopyItem extends Item implements IForgeItem {
     private final BlockConverter mConverter;
     private final IEncoder mEncoder;
     private final ICompressor mCompressor;
+    private final Printer mPrinter;
 
     /**
      * Constructor instantiates each part of the model.
@@ -53,6 +55,7 @@ class CopyItem extends Item implements IForgeItem {
         mConverter = BlockConverter.getInstance();
         mEncoder = new JabEncoder();
         mCompressor = new RunLengthCompressor();
+        mPrinter = new Printer(PrinterJob.getPrinterJob());
     }
 
     /**
@@ -135,15 +138,18 @@ class CopyItem extends Item implements IForgeItem {
                 return;
             }
 
-            // Print out the barcodePNG
+            // Print out the barcode in a given dimension
             try {
-                File outputFile = new File(SAVED_PNG_NAME);
-                ImageIO.write(barcodePNG, "png", outputFile);
-                Utility.sendChat("Saved as " + outputFile.getPath());
+                mPrinter.print(barcodePNG);
+                Utility.sendChat("Sent to printer!");
             }
-            catch(IOException e){
+            catch(PrinterException e){
+                Utility.sendChat("Failed to interact with printer, saved to file instead.");
+                Constants.logger.error("Printer#print threw a PrinterException\n" + e);
+            }
+            catch(IOException | IllegalArgumentException e){
                 Utility.sendChat("Failed to print out encoding!");
-                Constants.logger.error("ImageIO#write() threw an IOException\n" + e);
+                Constants.logger.error("Printer#print threw an Exception\n" + e);
                 return;
             }
 
