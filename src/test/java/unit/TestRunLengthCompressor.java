@@ -11,23 +11,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static testutil.Utility.assertByteArrayEquals;
 
 public class TestRunLengthCompressor {
     private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
     private final static String TEST_PATH = "unittest/rawRL.bytes";
 
     ICompressor mCompressor;
-
-    private static void assertByteArrayEquals(byte[] expected, byte[] actual){
-        if(expected.length != actual.length){
-            fail("Expected size != actual size");
-            return;
-        }
-
-        for(int i = 0; i < actual.length; i++){
-            assertEquals(expected[i], actual[i]);
-        }
-    }
 
     @BeforeEach
     public void setup(){

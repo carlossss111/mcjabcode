@@ -30,21 +30,21 @@ import java.util.concurrent.locks.ReentrantLock;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-public class TestPerformance {
+public class TestWritePerformance {
     // test
     private static final String BLOCKS_FILE_PATH = "performancetest/world.bytes";
     private static final int TARGET = 10*10*10;
 
     // logging & params
-    private static final String PASS_THROUGH_LOG_PATH = "performance/pass_through.log";
-    private static final String RUN_LENGTH_LOG_PATH = "performance/run_length.log";
-    private static final String RUN_LENGTH_MK2_LOG_PATH = "performance/run_length_mk2.log";
+    private static final String PASS_THROUGH_LOG_PATH = "performance/write/pass_through.log";
+    private static final String RUN_LENGTH_LOG_PATH = "performance/write/run_length.log";
+    private static final String RUN_LENGTH_MK2_LOG_PATH = "performance/write/run_length_mk2.log";
     private static final int PASS_THROUGH_STEP = 200;
     private static final int RUN_LENGTH_STEP = 200;
     private static final int RUN_LENGTH_MK2_STEP = 200;
 
     // concurrency
-    private int mTestThreadCount = 2;
+    private int mTestThreadCount = 3;
     ReentrantLock mInputMutex = new ReentrantLock();
     ReentrantLock mFinishMutex = new ReentrantLock();
 
@@ -59,7 +59,7 @@ public class TestPerformance {
     @BeforeAll
     public static void setupAll(){
         try {
-            File blockFile = new File(TestPerformance.class
+            File blockFile = new File(TestWritePerformance.class
                     .getClassLoader().getResource(BLOCKS_FILE_PATH).getPath());
             mBlocksAsBytes = Files.readAllBytes(blockFile.toPath());
         }

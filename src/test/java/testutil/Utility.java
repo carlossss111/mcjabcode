@@ -7,6 +7,9 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 import java.awt.image.BufferedImage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class Utility {
     public static boolean areImagesTheSame(BufferedImage imageA, BufferedImage imageB){
         int width  = imageA.getWidth();
@@ -27,13 +30,24 @@ public class Utility {
         return true;
     }
 
+    public static void assertByteArrayEquals(byte[] expected, byte[] actual){
+        if(expected.length != actual.length){
+            fail("Expected size != actual size");
+            return;
+        }
+
+        for(int i = 0; i < actual.length; i++){
+            assertEquals(expected[i], actual[i]);
+        }
+    }
+
+
     public static void addFileLogger(ConfigurationBuilder<BuiltConfiguration> builder,
                                      String loggerName, String fileName){
 
         builder .add(builder.newAppender(loggerName, "File").addAttribute("fileName", fileName))
                 .add(builder.newLogger(loggerName, Level.INFO)
-                        .add(builder.newAppenderRef(loggerName)
-                                .addAttribute("additivity", false)));
+                        .add(builder.newAppenderRef(loggerName)));
 
         AppenderComponentBuilder file
                 = builder.newAppender(loggerName, "File");
