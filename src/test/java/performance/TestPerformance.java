@@ -1,19 +1,19 @@
 package performance;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testutil.Utility;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.compression.PassThroughCompressor;
 import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
+import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressorMk2;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
@@ -27,17 +27,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.ibm.icu.impl.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-public class TestCompressionPerformance {
-    // consts
+public class TestPerformance {
+    // test
     private static final String BLOCKS_FILE_PATH = "performancetest/world.bytes";
+    private static final int TARGET = 10*10*10;
+
+    // logging & params
     private static final String PASS_THROUGH_LOG_PATH = "performance/pass_through.log";
     private static final String RUN_LENGTH_LOG_PATH = "performance/run_length.log";
-
-    // target for number of minecraft blocks to store
-    private static final int TARGET = 10*10*10;
+    private static final String RUN_LENGTH_MK2_LOG_PATH = "performance/run_length_mk2.log";
+    private static final int PASS_THROUGH_STEP = 200;
+    private static final int RUN_LENGTH_STEP = 200;
+    private static final int RUN_LENGTH_MK2_STEP = 200;
 
     // concurrency
     private int mTestThreadCount = 2;
@@ -55,7 +59,7 @@ public class TestCompressionPerformance {
     @BeforeAll
     public static void setupAll(){
         try {
-            File blockFile = new File(TestCompressionPerformance.class
+            File blockFile = new File(TestPerformance.class
                     .getClassLoader().getResource(BLOCKS_FILE_PATH).getPath());
             mBlocksAsBytes = Files.readAllBytes(blockFile.toPath());
         }
@@ -70,21 +74,6 @@ public class TestCompressionPerformance {
         mEncoder = new JabEncoder();
         mMockPrintJob = mock(PrinterJob.class);
         mPrinter = new Printer(mMockPrintJob);
-    }
-
-    // Log to file
-    private void addPerformanceLogger(ConfigurationBuilder<BuiltConfiguration> builder,
-                                      String loggerName, String fileName){
-
-        builder .add(builder.newAppender(loggerName, "File").addAttribute("fileName", fileName))
-                .add(builder.newLogger(loggerName, Level.INFO)
-                        .add(builder.newAppenderRef(loggerName)
-                                .addAttribute("additivity", false)));
-
-        AppenderComponentBuilder file
-                = builder.newAppender(loggerName, "File");
-        file.addAttribute("fileName", fileName);
-        builder.add(file);
     }
 
     /* Testing */
@@ -132,15 +121,17 @@ public class TestCompressionPerformance {
 
     // Tries the compression algorithms in seperate threads
     @Test
-    public void testCompressionPerformance() {
+    public void testPerformance() {
         ConfigurationBuilder<BuiltConfiguration> builder
                 = ConfigurationBuilderFactory.newConfigurationBuilder();
-        addPerformanceLogger(builder, "pass_through", PASS_THROUGH_LOG_PATH);
-        addPerformanceLogger(builder, "run_length", RUN_LENGTH_LOG_PATH);
+        Utility.addFileLogger(builder, "pass_through", PASS_THROUGH_LOG_PATH);
+        Utility.addFileLogger(builder, "run_length", RUN_LENGTH_LOG_PATH);
+        Utility.addFileLogger(builder, "run_length_mk2", RUN_LENGTH_MK2_LOG_PATH);
         LoggerContext ctx = Configurator.initialize(builder.build());
 
         new Thread(() -> {
-            tryCompression(new PassThroughCompressor(), 200,
+            tryCompression(new PassThroughCompressor(),
+                    PASS_THROUGH_STEP,
                     ctx.getLogger("pass_through"));
             mFinishMutex.lock();
             mTestThreadCount--;
@@ -148,8 +139,18 @@ public class TestCompressionPerformance {
         }).start();
 
         new Thread(() -> {
-            tryCompression(new RunLengthCompressor(), 500,
+            tryCompression(new RunLengthCompressor(),
+                    RUN_LENGTH_STEP,
                     ctx.getLogger("run_length"));
+            mFinishMutex.lock();
+            mTestThreadCount--;
+            mFinishMutex.unlock();
+        }).start();
+
+        new Thread(() -> {
+            tryCompression(new RunLengthCompressorMk2(),
+                    RUN_LENGTH_MK2_STEP,
+                    ctx.getLogger("run_length_mk2"));
             mFinishMutex.lock();
             mTestThreadCount--;
             mFinishMutex.unlock();

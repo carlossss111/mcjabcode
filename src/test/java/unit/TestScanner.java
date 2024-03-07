@@ -2,6 +2,7 @@ package unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testutil.Utility;
 import uk.ac.nottingham.hybridarcade.hardware.Scanner;
 
 import javax.imageio.ImageIO;
