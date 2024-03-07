@@ -1,3 +1,5 @@
+package unit;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TestPrinter {
-    private static final String BARCODE_PATH = "test/jabcode.png";
+    private static final String BARCODE_PATH = "unittest/jabcode.png";
 
     private Printer mPrinter;
     private PrinterJob mPrintJobMock;

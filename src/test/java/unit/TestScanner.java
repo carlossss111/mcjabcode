@@ -1,3 +1,5 @@
+package unit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.hardware.Scanner;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TestScanner {
-    private final String NETWORK_RETURNED_FILE = "test/jabcode.png";
+    private final String NETWORK_RETURNED_FILE = "unittest/jabcode.png";
 
     HttpClient mMockClient;
     HttpResponse mMockResponse;

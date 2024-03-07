@@ -1,3 +1,5 @@
+package unit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
@@ -12,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJabEncoder {
     private static final int ENCODE_MAX = 6797;
-    private static final String JABCODE_TEST_PNG = "test/jabcode.png";
-    private static final String JABCODE_INVALID_PNG = "test/unreadable.png";
+    private static final String JABCODE_TEST_PNG = "unittest/jabcode.png";
+    private static final String JABCODE_INVALID_PNG = "unittest/unreadable.png";
 
     JabEncoder mEncoder;
 

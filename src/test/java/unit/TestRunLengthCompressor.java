@@ -1,3 +1,5 @@
+package unit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.Constants;
@@ -12,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRunLengthCompressor {
     private final static byte RL = Constants.RESERVED_FOR_COMPRESSION_TK;
-    private final static String TEST_PATH = "test/rawRL.bytes";
+    private final static String TEST_PATH = "unittest/rawRL.bytes";
 
     ICompressor mCompressor;
 
