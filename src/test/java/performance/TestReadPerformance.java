@@ -21,6 +21,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.ibm.icu.impl.Assert.fail;
 
+// TODO: TRY WITH DIFFERENT ECC AND RAW SIZES
+
 public class TestReadPerformance {
     private static final String RSC_PATH = "performancetest";
 
@@ -28,11 +30,12 @@ public class TestReadPerformance {
     private static final String CONTRAST_LOG_PATH = "performance/read/contrast.log";
     private static final String BLUR_LOG_PATH = "performance/read/blur.log";
     private static final String ROTATE_LOG_PATH = "performance/read/rotate.log";
+    private static final String PERSPECTIVE_LOG_PATH = "performance/read/perspective.log";
 
     private IEncoder mEncoder;
     private ICompressor mCompressor;
 
-    private int mTestThreadCount = 4;
+    private int mTestThreadCount = 5;
     ReentrantLock mFinishMutex = new ReentrantLock();
     ReentrantLock mDecodeMutex = new ReentrantLock();
 
@@ -95,6 +98,7 @@ public class TestReadPerformance {
         testutil.Utility.addFileLogger(builder, "contrast", CONTRAST_LOG_PATH);
         testutil.Utility.addFileLogger(builder, "blur", BLUR_LOG_PATH);
         testutil.Utility.addFileLogger(builder, "rotate", ROTATE_LOG_PATH);
+        testutil.Utility.addFileLogger(builder, "perspective", PERSPECTIVE_LOG_PATH);
         LoggerContext ctx = Configurator.initialize(builder.build());
 
         new Thread(() -> {
@@ -120,6 +124,13 @@ public class TestReadPerformance {
 
         new Thread(() -> {
             tryRead("rotate", ctx.getLogger("rotate"), 0, 5, 90);
+            mFinishMutex.lock();
+            mTestThreadCount--;
+            mFinishMutex.unlock();
+        }).start();
+
+        new Thread(() -> {
+            tryRead("perspective", ctx.getLogger("perspective"), 0, 10, 300);
             mFinishMutex.lock();
             mTestThreadCount--;
             mFinishMutex.unlock();

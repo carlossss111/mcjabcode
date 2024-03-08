@@ -15,6 +15,9 @@ image_modify() {
     for i in $(seq 0 5 90); do
         convert -rotate "$i" "$RESOURCES_DIR/sample_barcode.png" "$RESOURCES_DIR/rotate$i.png"
     done
+    for i in $(seq 0 10 300); do
+        convert -virtual-pixel white -distort Perspective "0,732,0,732  732,732,732,$((732-i))  732,0,732,$i  0,0,0,0" "$RESOURCES_DIR/sample_barcode.png" "$RESOURCES_DIR/perspective$i.png"
+    done
 }
 
 image_cleanup() {
@@ -22,6 +25,7 @@ image_cleanup() {
     rm $RESOURCES_DIR/brightness*.png
     rm $RESOURCES_DIR/blur*.png
     rm $RESOURCES_DIR/rotate*.png
+    rm $RESOURCES_DIR/perspective*.png
 }
 
 if [ "$1" = 'modify' ]; then
