@@ -2,12 +2,6 @@ package performance;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.compression.PassThroughCompressor;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
@@ -23,24 +17,15 @@ import static com.ibm.icu.impl.Assert.fail;
 
 // TODO: TRY WITH DIFFERENT ECC AND RAW SIZES
 
-public class TestReadPerformance {
+public class ReadPerformance {
     private static final String RSC_PATH = "performancetest";
-
-    private static final String BRIGHTNESS_LOG_PATH = "performance/read/brightness.log";
-    private static final String CONTRAST_LOG_PATH = "performance/read/contrast.log";
-    private static final String BLUR_LOG_PATH = "performance/read/blur.log";
-    private static final String ROTATE_LOG_PATH = "performance/read/rotate.log";
-    private static final String PERSPECTIVE_LOG_PATH = "performance/read/perspective.log";
 
     private IEncoder mEncoder;
     private ICompressor mCompressor;
 
-    private int mTestThreadCount = 5;
-    ReentrantLock mFinishMutex = new ReentrantLock();
     ReentrantLock mDecodeMutex = new ReentrantLock();
 
-    @BeforeEach
-    public void setupClass(){
+    public ReadPerformance(){
         mEncoder = new JabEncoder();
         mCompressor = new PassThroughCompressor();
     }
@@ -49,7 +34,7 @@ public class TestReadPerformance {
         for(int i = start; i != finish+step; i += step){
             BufferedImage barcodePNG = null;
             try {
-                File barcodeFile = new File(TestWritePerformance.class
+                File barcodeFile = new File(WritePerformance.class
                         .getClassLoader().getResource(
                                 String.format("%s/%s%d.png", RSC_PATH, method, i)
                         ).getPath());
@@ -90,55 +75,25 @@ public class TestReadPerformance {
         }
     }
 
-    @Test
-    public void testReadPerformance() {
-        ConfigurationBuilder<BuiltConfiguration> builder
-                = ConfigurationBuilderFactory.newConfigurationBuilder();
-        testutil.Utility.addFileLogger(builder, "brightness", BRIGHTNESS_LOG_PATH);
-        testutil.Utility.addFileLogger(builder, "contrast", CONTRAST_LOG_PATH);
-        testutil.Utility.addFileLogger(builder, "blur", BLUR_LOG_PATH);
-        testutil.Utility.addFileLogger(builder, "rotate", ROTATE_LOG_PATH);
-        testutil.Utility.addFileLogger(builder, "perspective", PERSPECTIVE_LOG_PATH);
-        LoggerContext ctx = Configurator.initialize(builder.build());
-
+    public void testReadPerformance(LoggerContext ctx) {
         new Thread(() -> {
             tryRead("brightness", ctx.getLogger("brightness"), 0, -5, -100);
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
         }).start();
 
         new Thread(() -> {
             tryRead("contrast", ctx.getLogger("contrast"), 0, -5, -100);;
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
         }).start();
 
         new Thread(() -> {
             tryRead("blur", ctx.getLogger("blur"),0, 1, 10);
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
         }).start();
 
         new Thread(() -> {
             tryRead("rotate", ctx.getLogger("rotate"), 0, 5, 90);
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
         }).start();
 
         new Thread(() -> {
             tryRead("perspective", ctx.getLogger("perspective"), 0, 10, 300);
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
         }).start();
-
-        while(mTestThreadCount > 0){
-            try { Thread.sleep(100); }
-            catch(InterruptedException ignored){}
-        }
     }
 }

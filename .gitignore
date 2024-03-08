@@ -2,6 +2,7 @@
 .gradle/
 .idea/
 .vscode/
+.run/
 
 # Build Dirs
 bin/

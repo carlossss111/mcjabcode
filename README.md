@@ -58,7 +58,7 @@ the already existing library files.
 Running this repository's makefile with the correct statically linked binaries, you should see libJabEncoder.so 
 be created in the resources/encoding directory.
 ```
-make compile
+./gradlew compileCLibrary
 ```
 If there are errors, they may be because `-fPIC -D_REENTRANT -D_POSIX_C_SOURCE` was not
 set when compiling **every** library.
@@ -124,6 +124,17 @@ Generate javadocs to the `docs/` directory with
 ./gradlew javadoc
 ```
 and open in a web browser.
+
+## Testing
+Run unit tests with:
+```
+./gradlew test
+```
+and run performance tests with:
+```
+./gradlew performanceAnalysis
+```
+Performance logs are written into a 'logs' directory in the project root.
 
 ## Authors
 Written by: Daniel Robinson / psydr2@nottingham.ac.uk

@@ -2,14 +2,6 @@ package performance;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import testutil.Utility;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.compression.PassThroughCompressor;
 import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
@@ -30,36 +22,30 @@ import java.util.concurrent.locks.ReentrantLock;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-public class TestWritePerformance {
+public class WritePerformance {
     // test
     private static final String BLOCKS_FILE_PATH = "performancetest/world.bytes";
     private static final int TARGET = 10*10*10;
 
     // logging & params
-    private static final String PASS_THROUGH_LOG_PATH = "performance/write/pass_through.log";
-    private static final String RUN_LENGTH_LOG_PATH = "performance/write/run_length.log";
-    private static final String RUN_LENGTH_MK2_LOG_PATH = "performance/write/run_length_mk2.log";
     private static final int PASS_THROUGH_STEP = 200;
     private static final int RUN_LENGTH_STEP = 200;
     private static final int RUN_LENGTH_MK2_STEP = 200;
 
     // concurrency
-    private int mTestThreadCount = 3;
     ReentrantLock mInputMutex = new ReentrantLock();
-    ReentrantLock mFinishMutex = new ReentrantLock();
 
     // tested components
-    private static byte[] mBlocksAsBytes;
-    private IEncoder mEncoder;
-    private Printer mPrinter;
-    private PrinterJob mMockPrintJob;
+    private final byte[] mBlocksAsBytes;
+    private final IEncoder mEncoder;
+    private final Printer mPrinter;
+    private final PrinterJob mMockPrintJob;
 
     /* Setup */
 
-    @BeforeAll
-    public static void setupAll(){
+    public WritePerformance(){
         try {
-            File blockFile = new File(TestWritePerformance.class
+            File blockFile = new File(WritePerformance.class
                     .getClassLoader().getResource(BLOCKS_FILE_PATH).getPath());
             mBlocksAsBytes = Files.readAllBytes(blockFile.toPath());
         }
@@ -67,10 +53,7 @@ public class TestWritePerformance {
             fail("Error reading from file while setting up performance test." + e);
             throw new RuntimeException();
         }
-    }
 
-    @BeforeEach
-    public void setup(){
         mEncoder = new JabEncoder();
         mMockPrintJob = mock(PrinterJob.class);
         mPrinter = new Printer(mMockPrintJob);
@@ -120,45 +103,20 @@ public class TestWritePerformance {
     }
 
     // Tries the compression algorithms in seperate threads
-    @Test
-    public void testPerformance() {
-        ConfigurationBuilder<BuiltConfiguration> builder
-                = ConfigurationBuilderFactory.newConfigurationBuilder();
-        Utility.addFileLogger(builder, "pass_through", PASS_THROUGH_LOG_PATH);
-        Utility.addFileLogger(builder, "run_length", RUN_LENGTH_LOG_PATH);
-        Utility.addFileLogger(builder, "run_length_mk2", RUN_LENGTH_MK2_LOG_PATH);
-        LoggerContext ctx = Configurator.initialize(builder.build());
-
+    public void testPerformance(LoggerContext ctx) {
         new Thread(() -> {
             tryCompression(new PassThroughCompressor(),
-                    PASS_THROUGH_STEP,
-                    ctx.getLogger("pass_through"));
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
+                    PASS_THROUGH_STEP, ctx.getLogger("pass_through"));
         }).start();
 
         new Thread(() -> {
             tryCompression(new RunLengthCompressor(),
-                    RUN_LENGTH_STEP,
-                    ctx.getLogger("run_length"));
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
+                    RUN_LENGTH_STEP, ctx.getLogger("run_length"));
         }).start();
 
         new Thread(() -> {
             tryCompression(new RunLengthCompressorMk2(),
-                    RUN_LENGTH_MK2_STEP,
-                    ctx.getLogger("run_length_mk2"));
-            mFinishMutex.lock();
-            mTestThreadCount--;
-            mFinishMutex.unlock();
+                    RUN_LENGTH_MK2_STEP, ctx.getLogger("run_length_mk2"));
         }).start();
-
-        while(mTestThreadCount > 0){
-            try { Thread.sleep(100); }
-            catch(InterruptedException ignored){}
-        }
     }
 }
