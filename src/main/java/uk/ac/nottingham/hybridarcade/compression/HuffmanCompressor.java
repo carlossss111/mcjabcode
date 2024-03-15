@@ -1,8 +1,12 @@
 package uk.ac.nottingham.hybridarcade.compression;
 
+import org.apache.commons.compress.utils.BitInputStream;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,25 +53,16 @@ public class HuffmanCompressor implements ICompressor {
      * represents a '0' and right a '1'. The tree is created such that the
      * most common characters are found nearer to the top, so can be encoded in
      * less bits.
-     * @param rawBytes bytes to code
+     * @param bytesAndFreq a map of the characters and the frequency their appear at
      */
-    void buildTree(byte[] rawBytes){
-        // Get frequency of each byte
-        List<Byte> list = Arrays.asList(ArrayUtils.toObject(rawBytes));
-        Map<Byte, Integer> freqBytes = list.stream()
-                .distinct()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        v -> Collections.frequency(list, v))
-                );
-
+    void buildTree(Map<Byte, Integer> bytesAndFreq){
         // Build Priority Queue
         PriorityQueue<Node> pQueue =
-                new PriorityQueue<>(freqBytes.size(), new HuffComparator());
-        for (Byte key : freqBytes.keySet()) {
+                new PriorityQueue<>(bytesAndFreq.size(), new HuffComparator());
+        for (Byte key : bytesAndFreq.keySet()) {
             Node node = new Node();
             node.rawByte = key;
-            node.frequency = freqBytes.get(key);
+            node.frequency = bytesAndFreq.get(key);
             pQueue.add(node);
         }
 
@@ -84,40 +79,13 @@ public class HuffmanCompressor implements ICompressor {
         }
     }
 
-    // TODO wip
-    byte getFromTree(BitSet bits){
-        Node node = mRoot;
-        // Traverse tree according to bits
-        int i = 0;
-        for(;;){
-            if(bits.get(i) == true){
-                if(node.right != null) {
-                    node = node.right;
-                }
-                else{
-                    return node.rawByte;
-                }
-            }
-            else{
-                if(node.left != null) {
-                    node = node.left;
-                }
-                else{
-                    return node.rawByte;
-                }
-            }
-            i++;
-        }
-    }
-
-
     /**
      * Recursive function that traverses the tree in a preorder traversal and constructs
      * a table mapping the character to the coding.
      * @param node current node pointer
      * @param bitStr string of 'l' and 'r's to indicate the node's depth and position
      */
-    void traverseAndStore(Node node, String bitStr) {
+    void buildTableRecursively(Node node, String bitStr) {
         if (node == null) {
             return;
         }
@@ -133,37 +101,68 @@ public class HuffmanCompressor implements ICompressor {
         mBinaryTable.put(node.rawByte, bitSet);
 
         // Recurse in both directions
-        traverseAndStore(node.left, bitStr + "l");
-        traverseAndStore(node.right, bitStr + "r");
+        buildTableRecursively(node.left, bitStr + "l");
+        buildTableRecursively(node.right, bitStr + "r");
     }
 
-    void buildTableFromTree(){
-        traverseAndStore(mRoot, "");
-    };
-
-    void buildHeader(){
-        throw new NotImplementedException();
+    private byte shortToFirstByte(int num){
+        short snum = (short) num;
+        return (byte)(snum & 0xFF);
     }
 
-    void buildTableFromHeader(){
-        throw new NotImplementedException();
+    private byte shortToSecondByte(int num){
+        short snum = (short) num;
+        return (byte)((snum >> 8) & 0xFF);
     }
 
-    void buildTreeFromTable(){
-        throw new NotImplementedException();
+    private short bytesToShort(byte b0, byte b1){
+        return (short) ((short) ((b1 & 0xFF) << 8) | (b0 & 0xFF));
     }
 
+    ByteArrayOutputStream buildHeader(Map<Byte, Integer> bytesAndFreq){
+        ByteArrayOutputStream header = new ByteArrayOutputStream();
 
+        PriorityQueue<Node> pQueue =
+                new PriorityQueue<>(bytesAndFreq.size(), new HuffComparator());
+        for (Byte key : bytesAndFreq.keySet()) {
+            Node node = new Node();
+            node.rawByte = key;
+            node.frequency = bytesAndFreq.get(key);
+            pQueue.add(node);
+        }
+
+        header.write(0);
+        header.write(0);
+        header.write(shortToFirstByte(pQueue.size()*3 + 4));
+        header.write(shortToSecondByte(pQueue.size()*3 + 4));
+        while(pQueue.size() > 0){
+            Node node = pQueue.remove();
+            header.write(node.rawByte);
+            header.write(shortToFirstByte(node.frequency));
+            header.write(shortToSecondByte(node.frequency));
+        }
+
+        return header;
+    }
 
     @Override
     public byte[] compress(byte[] rawBytes) {
+        // Get Mapping of bytes and their frequencies
+        List<Byte> list = Arrays.asList(ArrayUtils.toObject(rawBytes));
+        Map<Byte, Integer> freqBytes = list.stream()
+                .distinct()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        v -> Collections.frequency(list, v))
+                );
+
         // Construct the coding
-        buildTree(rawBytes);
-        buildTableFromTree();
+        buildTree(freqBytes);
+        buildTableRecursively(mRoot, "");
 
         // Construct the message header containing the tree in some form
         BitSet resultSet = new BitSet();
-        //buildHeader(); //TODO
+        ByteArrayOutputStream resultStream = buildHeader(freqBytes);
 
         /*
             Loop through the entire raw byte array, and get each byte as a coded
@@ -181,23 +180,69 @@ public class HuffmanCompressor implements ICompressor {
             }
         }
         //Little Endian, smallest bits first
-        return resultSet.toByteArray();
+        resultStream.writeBytes(resultSet.toByteArray());
+        byte[] resultArr = resultStream.toByteArray();
+        resultArr[0] = shortToFirstByte(resultIndex);
+        resultArr[1] = shortToSecondByte(resultIndex);
+        return resultArr;
     }
 
     @Override
     public byte[] decompress(byte[] compressedBytes) throws IllegalArgumentException {
-        buildTableFromHeader();
-        buildTreeFromTable();
+
+        int compressedBitSize = bytesToShort(compressedBytes[0], compressedBytes[1]);
+
+        // Read the header
+        Map<Byte, Integer> byteFreq = new HashMap<>();
+        int headerSize = bytesToShort(compressedBytes[2], compressedBytes[3]);
+        for(int i = 4; i < headerSize; i+= 3){
+            int freq = bytesToShort(compressedBytes[i+1], compressedBytes[i+2]);
+            byteFreq.put(compressedBytes[i], freq);
+        }
+
+        // Tree built should be exactly the same.
+        buildTree(byteFreq);
 
         /*
-        TODO
-        <<Psuedocode>>
         Loop through compressedBytes bits:
             follow the tree,
             when reaching a leaf node:
                 add corresponding byte to output,
                 reset position in the tree to the root
          */
-        return null;
+        ByteArrayOutputStream rawStream = new ByteArrayOutputStream();
+        ByteArrayInputStream compressedStream = new ByteArrayInputStream(compressedBytes);
+        BitInputStream bits = new BitInputStream(compressedStream, ByteOrder.LITTLE_ENDIAN);
+        try {
+            //Skip Header
+            for (int i = 0; i < headerSize; i++) {
+                bits.readBits(8);
+            }
+
+            Node node = mRoot;
+            for(int i = 0; i < compressedBitSize; i++) {
+                long current = bits.readBits(1);
+                // LEFT
+                if (current == 0 || current == -1){
+                    node = node.left;
+                    if(node.left == null && node.right == null){
+                        rawStream.write(node.rawByte);
+                        node = mRoot;
+                    }
+                }
+                //RIGHT
+                else if (current == 1){
+                    node = node.right;
+                    if(node.left == null && node.right == null){
+                        rawStream.write(node.rawByte);
+                        node = mRoot;
+                    }
+                }
+            }
+        }
+        catch(IOException e){
+            throw new IllegalArgumentException(e);
+        }
+        return rawStream.toByteArray();
     }
 }

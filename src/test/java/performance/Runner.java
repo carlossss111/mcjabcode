@@ -1,9 +1,7 @@
 package performance;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
@@ -18,6 +16,7 @@ public class Runner {
         Utility.addFileLogger(builder, "pass_through", "performance/write/pass_through.log");
         Utility.addFileLogger(builder, "run_length", "performance/write/run_length.log");
         Utility.addFileLogger(builder, "run_length_mk2", "performance/write/run_length_mk2.log");
+        Utility.addFileLogger(builder, "huffman", "performance/write/huffman.log");
         Utility.addFileLogger(builder, "brightness", "performance/read/brightness.log");
         Utility.addFileLogger(builder, "contrast", "performance/read/contrast.log");
         Utility.addFileLogger(builder, "blur", "performance/read/blur.log");

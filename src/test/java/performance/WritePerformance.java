@@ -2,10 +2,7 @@ package performance;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import uk.ac.nottingham.hybridarcade.compression.ICompressor;
-import uk.ac.nottingham.hybridarcade.compression.PassThroughCompressor;
-import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
-import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressorMk2;
+import uk.ac.nottingham.hybridarcade.compression.*;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
@@ -31,6 +28,7 @@ public class WritePerformance {
     private static final int PASS_THROUGH_STEP = 200;
     private static final int RUN_LENGTH_STEP = 200;
     private static final int RUN_LENGTH_MK2_STEP = 200;
+    private static final int HUFFMAN_STEP = 200;
 
     // concurrency
     ReentrantLock mInputMutex = new ReentrantLock();
@@ -117,6 +115,11 @@ public class WritePerformance {
         new Thread(() -> {
             tryCompression(new RunLengthCompressorMk2(),
                     RUN_LENGTH_MK2_STEP, ctx.getLogger("run_length_mk2"));
+        }).start();
+
+        new Thread(() -> {
+            tryCompression(new HuffmanCompressor(),
+                    HUFFMAN_STEP, ctx.getLogger("huffman"));
         }).start();
     }
 }
