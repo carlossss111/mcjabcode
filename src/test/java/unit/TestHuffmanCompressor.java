@@ -27,13 +27,13 @@ public class TestHuffmanCompressor {
 
         byte[] expectedOutput = new byte[] {
                 25,0,42,0, //42 payload BITS in total, 25 BYTES in the header
-                'D',1,0,
-                'Z',1,0,
-                'X',1,0,
-                'Y',1,0,
+                'A',8,0,
                 'B',2,0,
                 'C',4,0,
-                'A',8,0,
+                'D',1,0,
+                'X',1,0,
+                'Y',1,0,
+                'Z',1,0,
                 -17, 47, -64, 93, -43};
         assertByteArrayEquals(expectedOutput, testOutput);
     }
@@ -67,7 +67,7 @@ public class TestHuffmanCompressor {
     }
 
     @Test
-    public void testManyDifferentBlockTypes() throws Exception {
+    public void testEqualityOrderingBug() throws Exception {
         File fp = new File(getClass()
                 .getClassLoader().getResource(TEST_PATH_2).getPath());
         byte[] rawBytes = Files.readAllBytes(fp.toPath());

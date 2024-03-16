@@ -135,18 +135,9 @@ public class HuffmanCompressor implements ICompressor {
         HuffHeader(Map<Byte, Integer> byteFreq, int payloadSize) {
             mValueAndFrequency = byteFreq;
 
-            PriorityQueue<Node> pQueue =
-                    new PriorityQueue<>(mValueAndFrequency.size(), huffComparator);
-            for (Byte key : mValueAndFrequency.keySet()) {
-                Node node = new Node();
-                node.rawByte = key;
-                node.frequency = mValueAndFrequency.get(key);
-                pQueue.add(node);
-            }
-
             // Calculation: payload size (2 bytes) + header size (2 bytes) +
             // {each element (1 byte) + each element's frequency (2 bytes)} * num of elems
-            mHeaderSizeInBytes = pQueue.size()*3 + 4;
+            mHeaderSizeInBytes = mValueAndFrequency.size()*3 + 4;
             mPayloadSizeInBits = payloadSize;
 
             // First two bytes is the header size (short), next two are payload size (short),
@@ -156,11 +147,10 @@ public class HuffmanCompressor implements ICompressor {
             hStream.write(toSecondByte(mHeaderSizeInBytes));
             hStream.write(toFirstByte(mPayloadSizeInBits));
             hStream.write(toSecondByte(mPayloadSizeInBits));
-            while(pQueue.size() > 0){
-                Node node = pQueue.remove();
-                hStream.write(node.rawByte);
-                hStream.write(toFirstByte(node.frequency));
-                hStream.write(toSecondByte(node.frequency));
+            for(Byte key : mValueAndFrequency.keySet()){
+                hStream.write(key);
+                hStream.write(toFirstByte(mValueAndFrequency.get(key)));
+                hStream.write(toSecondByte(mValueAndFrequency.get(key)));
             }
             mBytes = hStream.toByteArray();
         }
