@@ -12,6 +12,7 @@ import static testutil.Utility.assertByteArrayEquals;
 
 public class TestHuffmanCompressor {
     private final static String TEST_PATH = "performancetest/world.bytes";
+    private final static String TEST_PATH_2 = "unittest/rawHF.bytes";
     private HuffmanCompressor mCompressor;
 
     @BeforeEach
@@ -25,7 +26,7 @@ public class TestHuffmanCompressor {
         byte[] testOutput = mCompressor.compress(testInput);
 
         byte[] expectedOutput = new byte[] {
-                42,0,25,0, //42 payload BITS in total, 25 BYTES in the header
+                25,0,42,0, //42 payload BITS in total, 25 BYTES in the header
                 'D',1,0,
                 'Z',1,0,
                 'X',1,0,
@@ -40,7 +41,7 @@ public class TestHuffmanCompressor {
     @Test
     public void testDecompressionIsCorrect(){
         byte[] testInput = new byte[] {
-                42,0,25,0,
+                25,0,42,0,
                 'D',1,0,
                 'Z',1,0,
                 'X',1,0,
@@ -59,6 +60,16 @@ public class TestHuffmanCompressor {
     public void testLargeFile() throws Exception {
         File fp = new File(getClass()
                 .getClassLoader().getResource(TEST_PATH).getPath());
+        byte[] rawBytes = Files.readAllBytes(fp.toPath());
+        byte[] compressedBytes = mCompressor.compress(rawBytes);
+        byte[] decompressedBytes = mCompressor.decompress(compressedBytes);
+        assertByteArrayEquals(rawBytes, decompressedBytes);
+    }
+
+    @Test
+    public void testManyDifferentBlockTypes() throws Exception {
+        File fp = new File(getClass()
+                .getClassLoader().getResource(TEST_PATH_2).getPath());
         byte[] rawBytes = Files.readAllBytes(fp.toPath());
         byte[] compressedBytes = mCompressor.compress(rawBytes);
         byte[] decompressedBytes = mCompressor.decompress(compressedBytes);
