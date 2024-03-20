@@ -12,13 +12,13 @@ import java.io.IOException;
  * @see <a href="https://jabcode.org/">jabcode.org</a>
  * @author Daniel Robinson 2024
  */
-public class JabEncoder implements IEncoder{
+public class JabEncoder {
 
     static {
         System.loadLibrary("JabEncoder");
     }
 
-    private native byte[] saveEncoding(byte[] data);
+    private native byte[] saveEncoding(byte[] data, int eccLevel);
 
     private native byte[] readEncoding(byte[] png);
 
@@ -28,9 +28,8 @@ public class JabEncoder implements IEncoder{
      * @return PNG image of the JAB encoding.
      * @throws IOException if the C Shared Object failed to encode the data.
      */
-    @Override
-    public BufferedImage encode(byte[] data) throws IOException {
-        byte[] pngRaw = saveEncoding(data);
+    public BufferedImage encode(byte[] data, int eccLevel) throws IOException {
+        byte[] pngRaw = saveEncoding(data, eccLevel);
         if(pngRaw == null){
             throw new IOException("C Lib fail failed to generate JAB code");
         }
@@ -43,7 +42,6 @@ public class JabEncoder implements IEncoder{
      * @return Bytes encoded in the image.
      * @throws IOException if the C Shared Object failed to decode the data.
      */
-    @Override
     public byte[] decode(BufferedImage image) throws IOException{
         ByteArrayOutputStream pngSteam = new ByteArrayOutputStream();
         ImageIO.write(image, "png", pngSteam);

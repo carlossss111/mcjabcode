@@ -19,5 +19,5 @@ public class Constants {
     public static final byte RESERVED_FOR_COMPRESSION_TK = (byte) 255;
     public static final String RESERVED_KEYWORD = "RESERVED";
 
-    public static final String SCANNER_URI = "http://raspberrypi.local:5000";
+    public static final String SCANNER_URI = "http://danrasp.local:5000";
 }

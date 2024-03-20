@@ -4,7 +4,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.compression.PassThroughCompressor;
-import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 
 import javax.imageio.ImageIO;
@@ -20,7 +19,7 @@ import static com.ibm.icu.impl.Assert.fail;
 public class ReadPerformance {
     private static final String RSC_PATH = "performancetest";
 
-    private IEncoder mEncoder;
+    private JabEncoder mEncoder;
     private ICompressor mCompressor;
 
     ReentrantLock mDecodeMutex = new ReentrantLock();

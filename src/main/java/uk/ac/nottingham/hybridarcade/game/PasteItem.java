@@ -13,7 +13,6 @@ import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.compression.*;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
-import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Scanner;
 
@@ -33,7 +32,7 @@ import java.net.http.HttpClient;
  * Conceptually, PasteItem is a Controller in the Model-View-Controller pattern.
  * @see PasteSelection
  * @see Scanner
- * @see IEncoder
+ * @see JabEncoder
  * @see ICompressor
  * @see BlockConverter
  * @author Daniel Robinson 2024
@@ -44,7 +43,7 @@ class PasteItem extends Item implements IForgeItem {
 
     private final PasteSelection mPasteSelection;
     private final BlockConverter mConverter;
-    private final IEncoder mDecoder;
+    private final JabEncoder mDecoder;
     private final ICompressor mDecompressor;
     private final Scanner mScanner;
 

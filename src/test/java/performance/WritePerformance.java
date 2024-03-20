@@ -3,7 +3,6 @@ package performance;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import uk.ac.nottingham.hybridarcade.compression.*;
-import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
 
@@ -35,7 +34,7 @@ public class WritePerformance {
 
     // tested components
     private final byte[] mBlocksAsBytes;
-    private final IEncoder mEncoder;
+    private final JabEncoder mEncoder;
     private final Printer mPrinter;
     private final PrinterJob mMockPrintJob;
 
@@ -60,11 +59,11 @@ public class WritePerformance {
     /* Testing */
 
     // Tries to compress, encode and mock print
-    private int findBestPerformance(byte[] rawBytes, ICompressor compressor, Logger log){
+    private int findBestPerformance(byte[] rawBytes, ICompressor compressor, Logger log, int ecc){
         byte[] compressedBytes = compressor.compress(rawBytes);
         BufferedImage barcodePNG;
         try{
-            barcodePNG = mEncoder.encode(compressedBytes);
+            barcodePNG = mEncoder.encode(compressedBytes, ecc);
         }
         catch(IOException e){
             log.info(String.format("FAIL: at ENCODE with raw=%d\n%s", rawBytes.length, e));
@@ -83,7 +82,7 @@ public class WritePerformance {
     }
 
     // Loops through a bytestream representing blocks converted to bytes and tries to encode them
-    private void tryCompression(ICompressor compressor, int steps, Logger logger){
+    private void tryCompression(ICompressor compressor, int steps, Logger logger, int ecc){
         ByteArrayOutputStream bytesToTry = new ByteArrayOutputStream();
         int offset = 0;
         do{
@@ -94,32 +93,32 @@ public class WritePerformance {
             if(offset + steps > mBlocksAsBytes.length){
                 offset = 0;
             }
-        }while(findBestPerformance(bytesToTry.toByteArray(), compressor, logger) > 0);
+        }while(findBestPerformance(bytesToTry.toByteArray(), compressor, logger, ecc) > 0);
         if(bytesToTry.size() < TARGET){
             fail("Performance below target.");
         }
     }
 
     // Tries the compression algorithms in seperate threads
-    public void testPerformance(LoggerContext ctx) {
+    public void testPerformance(LoggerContext ctx, int ecc) {
         new Thread(() -> {
             tryCompression(new PassThroughCompressor(),
-                    PASS_THROUGH_STEP, ctx.getLogger("pass_through"));
+                    PASS_THROUGH_STEP, ctx.getLogger("pass_through"), ecc);
         }).start();
 
         new Thread(() -> {
             tryCompression(new RunLengthCompressor(),
-                    RUN_LENGTH_STEP, ctx.getLogger("run_length"));
+                    RUN_LENGTH_STEP, ctx.getLogger("run_length"), ecc);
         }).start();
 
         new Thread(() -> {
             tryCompression(new RunLengthCompressorMk2(),
-                    RUN_LENGTH_MK2_STEP, ctx.getLogger("run_length_mk2"));
+                    RUN_LENGTH_MK2_STEP, ctx.getLogger("run_length_mk2"), ecc);
         }).start();
 
         new Thread(() -> {
             tryCompression(new HuffmanCompressor(),
-                    HUFFMAN_STEP, ctx.getLogger("huffman"));
+                    HUFFMAN_STEP, ctx.getLogger("huffman"), ecc);
         }).start();
     }
 }

@@ -18,12 +18,22 @@ struct jab_png{
 	jab_int32 size;
 }typedef jab_png;
 
-jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength){
+jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength, jab_int32 eccLevel){
 	// Initialise encoding
 	jab_encode* encoding = createEncode(NUM_OF_COLOURS, NUM_OF_SYMBOLS);
 	jab_data* encodingData = (jab_data*) malloc(sizeof(jab_data) + streamInLength * sizeof(jab_char));
 	encodingData->length = streamInLength;
 	memcpy(encodingData->data, streamIn, streamInLength);
+
+	// Error Correction Level
+	if(eccLevel < 0 || eccLevel > 10){
+		printf("ECC Level is not between 0 and 10, exiting.\n");
+		fflush(stdout);
+		free(encodingData);
+		destroyEncode(encoding);
+		return NULL;
+	}
+	encoding->symbol_ecc_levels[0] = eccLevel;
 
 	// Generate JABcode
 	int exitCode = generateJABCode(encoding, encodingData);
@@ -47,14 +57,14 @@ jab_png* myEncode(jab_byte *streamIn, jab_int32 streamInLength){
 }
 
 JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
-  (JNIEnv* env, jobject obj, jbyteArray jStreamIn){
+  (JNIEnv* env, jobject obj, jbyteArray jStreamIn, jint jEccLevel){
 	
 	// Types: Java -> C
 	jab_byte *streamIn = (*env)->GetByteArrayElements(env, jStreamIn, NULL);
 	jab_int32 streamInLength = (*env)->GetArrayLength(env, jStreamIn);
 
 	// Do Work
-	jab_png *png = myEncode(streamIn, streamInLength);
+	jab_png *png = myEncode(streamIn, streamInLength, jEccLevel);
 	if(!png){
 		(*env)->ReleaseByteArrayElements(env, jStreamIn, streamIn, 0);
 		return NULL;

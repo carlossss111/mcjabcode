@@ -14,7 +14,6 @@ import uk.ac.nottingham.hybridarcade.Utility;
 import uk.ac.nottingham.hybridarcade.compression.BestCompressor;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
-import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
 
@@ -34,7 +33,7 @@ import java.io.IOException;
  * <br/><br/>
  * Conceptually, CopyItem is a Controller in the Model-View-Controller pattern.
  * @see CopySelection
- * @see IEncoder
+ * @see JabEncoder
  * @see ICompressor
  * @see BlockConverter
  * @author Daniel Robinson 2024
@@ -46,7 +45,7 @@ class CopyItem extends Item implements IForgeItem {
 
     private final CopySelection mCopySelection;
     private final BlockConverter mConverter;
-    private final IEncoder mEncoder;
+    private final JabEncoder mEncoder;
     private final ICompressor mCompressor;
     private final Printer mPrinter;
 
@@ -134,7 +133,7 @@ class CopyItem extends Item implements IForgeItem {
             // Get the blocks as a barcode PNG image
             BufferedImage barcodePNG;
             try {
-                barcodePNG = mEncoder.encode(compressedBytes);
+                barcodePNG = mEncoder.encode(compressedBytes, ENCODING_ECC_LEVEL);
             }
             catch(IOException e){
                 Utility.sendChat("Failed to generate encoding!");

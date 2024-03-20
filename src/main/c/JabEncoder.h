@@ -17,7 +17,7 @@ extern "C" {
  * Signature: ([B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_uk_ac_nottingham_hybridarcade_encoding_JabEncoder_saveEncoding
-  (JNIEnv *, jobject, jbyteArray);
+  (JNIEnv *, jobject, jbyteArray, jint);
 
 /*
  * Class:     uk_ac_nottingham_hybridarcade_encoding_JabEncoder

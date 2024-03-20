@@ -42,7 +42,7 @@ public class TestJabEncoder {
         streamIn[0] = 65;//A
         streamIn[1] = 66;//B
         streamIn[2] = 67;//C
-        actualPNG = mEncoder.encode(streamIn);
+        actualPNG = mEncoder.encode(streamIn, 0);
 
         assertNotNull(actualPNG);
         assertTrue(Utility.areImagesTheSame(expectedPNG, actualPNG));
@@ -53,7 +53,7 @@ public class TestJabEncoder {
         byte[] streamIn = new byte[ENCODE_MAX];
         Arrays.fill(streamIn, (byte) 'A');
 
-        BufferedImage png = mEncoder.encode(streamIn);
+        BufferedImage png = mEncoder.encode(streamIn, 0);
         assertNotNull(png);
     }
 
@@ -62,7 +62,7 @@ public class TestJabEncoder {
         byte[] streamIn = new byte[ENCODE_MAX + 1];
         Arrays.fill(streamIn, (byte) 'A');
 
-        assertThrows(IOException.class, () -> mEncoder.encode(streamIn));
+        assertThrows(IOException.class, () -> mEncoder.encode(streamIn, 0));
     }
 
     @Test
@@ -97,5 +97,30 @@ public class TestJabEncoder {
 
         BufferedImage finalInputPNG = inputPNG;
         assertThrows(IOException.class, () -> mEncoder.decode(finalInputPNG));
+    }
+
+    @Test
+    public void testECC() throws IOException{
+        byte[] streamIn = new byte[1024];
+        Arrays.fill(streamIn, (byte) 'A');
+
+        int eccLow = 1;
+        int eccHigh = 10;
+
+        BufferedImage pngLow = mEncoder.encode(streamIn, eccLow);
+        BufferedImage pngHigh = mEncoder.encode(streamIn, eccHigh);
+        assertTrue(pngLow.getWidth() < pngHigh.getWidth());
+    }
+
+    @Test
+    public void testInvalidECCThrows(){
+        byte[] streamIn = new byte[1024];
+        Arrays.fill(streamIn, (byte) 'A');
+
+        int eccTooLow = -1;
+        int eccTooHigh = 11;
+
+        assertThrows(IOException.class, () -> mEncoder.encode(streamIn, eccTooLow));
+        assertThrows(IOException.class, () -> mEncoder.encode(streamIn, eccTooHigh));
     }
 }

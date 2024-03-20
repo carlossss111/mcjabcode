@@ -29,7 +29,12 @@ public class Runner {
             new ReadPerformance().testReadPerformance(ctx);
         }
         if(args[0].equals("write")){
-            new WritePerformance().testPerformance(ctx);
+            if(args.length == 2){
+                new WritePerformance().testPerformance(ctx, Integer.parseInt(args[1]));
+            }
+            else{
+                new WritePerformance().testPerformance(ctx, 0);
+            }
         }
     }
 }
