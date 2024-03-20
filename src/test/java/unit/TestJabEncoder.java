@@ -17,6 +17,7 @@ public class TestJabEncoder {
     private static final int ENCODE_MAX = 6797;
     private static final String JABCODE_TEST_PNG = "unittest/jabcode.png";
     private static final String JABCODE_INVALID_PNG = "unittest/unreadable.png";
+    private static final String JABCODE_ROTATED_PNG = "unittest/rotate45.png";
 
     JabEncoder mEncoder;
 
@@ -122,5 +123,40 @@ public class TestJabEncoder {
 
         assertThrows(IOException.class, () -> mEncoder.encode(streamIn, eccTooLow));
         assertThrows(IOException.class, () -> mEncoder.encode(streamIn, eccTooHigh));
+    }
+
+    @Test
+    public void testDecodeRotatesCorrectly() throws IOException{
+        BufferedImage inputPNG = null;
+        try {
+            File inputFile = new File(getClass()
+                    .getClassLoader().getResource(JABCODE_ROTATED_PNG).getPath());
+            inputPNG = ImageIO.read(inputFile);
+        }
+        catch(Exception e){
+            fail("Problem with the test, jabcode png not loaded.");
+        }
+
+        // This PNG is too damaged so needs image correction
+        BufferedImage finalInputPNG = inputPNG;
+        assertDoesNotThrow(() -> mEncoder.decode(finalInputPNG));
+    }
+
+    @Test
+    public void testDecodeRotatesOnlyWhenEnabled() throws IOException{
+        BufferedImage inputPNG = null;
+        try {
+            File inputFile = new File(getClass()
+                    .getClassLoader().getResource(JABCODE_ROTATED_PNG).getPath());
+            inputPNG = ImageIO.read(inputFile);
+        }
+        catch(Exception e){
+            fail("Problem with the test, jabcode png not loaded.");
+        }
+
+        mEncoder.setImageCorrection(false);
+
+        BufferedImage finalInputPNG = inputPNG;
+        assertThrows(IOException.class, () -> mEncoder.decode(finalInputPNG));
     }
 }

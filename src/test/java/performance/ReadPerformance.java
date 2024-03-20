@@ -29,7 +29,7 @@ public class ReadPerformance {
         mCompressor = new PassThroughCompressor();
     }
 
-    private void tryRead(String method, Logger log, int start, int step, int finish){
+    private void tryRead(String method, Logger log, int start, int step, int finish, boolean imageCorrection){
         for(int i = start; i != finish+step; i += step){
             BufferedImage barcodePNG = null;
             try {
@@ -46,6 +46,7 @@ public class ReadPerformance {
             byte[] decodedBytes;
             try{
                 mDecodeMutex.lock();
+                mEncoder.setImageCorrection(imageCorrection);
                 decodedBytes = mEncoder.decode(barcodePNG);
                 mDecodeMutex.unlock();
             }
@@ -76,23 +77,23 @@ public class ReadPerformance {
 
     public void testReadPerformance(LoggerContext ctx) {
         new Thread(() -> {
-            tryRead("brightness", ctx.getLogger("brightness"), 0, -5, -100);
+            tryRead("brightness", ctx.getLogger("brightness"), 0, -5, -100, false);
         }).start();
 
         new Thread(() -> {
-            tryRead("contrast", ctx.getLogger("contrast"), 0, -5, -100);;
+            tryRead("contrast", ctx.getLogger("contrast"), 0, -5, -100, false);
         }).start();
 
         new Thread(() -> {
-            tryRead("blur", ctx.getLogger("blur"),0, 1, 10);
+            tryRead("blur", ctx.getLogger("blur"),0, 1, 10, false);
         }).start();
 
         new Thread(() -> {
-            tryRead("rotate", ctx.getLogger("rotate"), 0, 5, 90);
+            tryRead("rotate", ctx.getLogger("rotate"), 0, 5, 90, true);
         }).start();
 
         new Thread(() -> {
-            tryRead("perspective", ctx.getLogger("perspective"), 0, 10, 300);
+            tryRead("perspective", ctx.getLogger("perspective"), 0, 10, 300, false);
         }).start();
     }
 }
