@@ -11,14 +11,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
-import uk.ac.nottingham.hybridarcade.compression.ICompressor;
-import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
+import uk.ac.nottingham.hybridarcade.compression.*;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Scanner;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 
@@ -38,6 +39,9 @@ import java.net.http.HttpClient;
  * @author Daniel Robinson 2024
  */
 class PasteItem extends Item implements IForgeItem {
+
+    private static final boolean MOCK_SCANNER = true;
+
     private final PasteSelection mPasteSelection;
     private final BlockConverter mConverter;
     private final IEncoder mDecoder;
@@ -52,8 +56,8 @@ class PasteItem extends Item implements IForgeItem {
         mPasteSelection = new PasteSelection();
         mConverter = BlockConverter.getInstance();
         mDecoder = new JabEncoder();
+        mDecompressor = new BestCompressor();
         mScanner = new Scanner(HttpClient.newHttpClient());
-        mDecompressor = new RunLengthCompressor();
     }
 
     /**
@@ -115,7 +119,12 @@ class PasteItem extends Item implements IForgeItem {
             // Scan PNG
             BufferedImage barcodePNG;
             try{
-                barcodePNG = mScanner.scan();
+                if (MOCK_SCANNER) {
+                    barcodePNG = ImageIO.read(new File("mock_barcode.png"));
+                }
+                else {
+                    barcodePNG = mScanner.scan();
+                }
             }
             catch(IOException e){
                 Utility.sendChat("Failed to scan encoding!");

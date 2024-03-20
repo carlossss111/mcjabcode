@@ -1,5 +1,9 @@
 package uk.ac.nottingham.hybridarcade.compression;
 
+/**
+ * An empty that does no compression. A concrete implementation of the interface
+ * is still provided in-case any side-effects should be added in the future.
+ */
 public class PassThroughCompressor implements ICompressor{
 
     @Override

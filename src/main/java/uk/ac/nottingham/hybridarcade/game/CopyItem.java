@@ -11,16 +11,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.extensions.IForgeItem;
 import uk.ac.nottingham.hybridarcade.Constants;
 import uk.ac.nottingham.hybridarcade.Utility;
+import uk.ac.nottingham.hybridarcade.compression.BestCompressor;
 import uk.ac.nottingham.hybridarcade.compression.ICompressor;
-import uk.ac.nottingham.hybridarcade.compression.RunLengthCompressor;
 import uk.ac.nottingham.hybridarcade.converter.BlockConverter;
 import uk.ac.nottingham.hybridarcade.encoding.IEncoder;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -38,7 +40,9 @@ import java.io.IOException;
  * @author Daniel Robinson 2024
  */
 class CopyItem extends Item implements IForgeItem {
-    private final static String SAVED_PNG_NAME = "barcode.png";
+    private final static int ENCODING_ECC_LEVEL = 1;
+
+    private final static boolean MOCK_PRINTER = true;
 
     private final CopySelection mCopySelection;
     private final BlockConverter mConverter;
@@ -54,7 +58,7 @@ class CopyItem extends Item implements IForgeItem {
         mCopySelection = new CopySelection();
         mConverter = BlockConverter.getInstance();
         mEncoder = new JabEncoder();
-        mCompressor = new RunLengthCompressor();
+        mCompressor = new BestCompressor();
         mPrinter = new Printer(PrinterJob.getPrinterJob());
     }
 
@@ -140,8 +144,13 @@ class CopyItem extends Item implements IForgeItem {
 
             // Print out the barcode in a given dimension
             try {
-                mPrinter.print(barcodePNG);
-                Utility.sendChat("Sent to printer!");
+                if(MOCK_PRINTER){
+                    ImageIO.write(barcodePNG,"png",new File("mock_barcode.png"));
+                }
+                else {
+                    mPrinter.print(barcodePNG);
+                    Utility.sendChat("Sent to printer!");
+                }
             }
             catch(PrinterException e){
                 Utility.sendChat("Failed to interact with printer, saved to file instead.");
