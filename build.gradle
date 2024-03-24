@@ -90,6 +90,14 @@ tasks.register('compileCLibrary') {
     }
 }
 
+tasks.register('compileCLibraryWin') {
+    doFirst {
+        exec {
+            commandLine 'make', '-f', 'Makefile.win', 'compile'
+        }
+    }
+}
+
 tasks.named('test', Test) {
     useJUnitPlatform()
 
