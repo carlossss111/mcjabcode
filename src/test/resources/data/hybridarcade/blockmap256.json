@@ -1,0 +1,6 @@
+{
+  "block.minecraft.air":            0,
+  "block.minecraft.stone":          1,
+  "block.minecraft.grass_block":    2,
+  "RESERVED":                       255
+}

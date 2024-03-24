@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import uk.ac.nottingham.hybridarcade.Constants;
+import uk.ac.nottingham.hybridarcade.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @author Daniel Robinson 2024
  */
 public class BlockConverter {
-    private static final String BLOCKMAP_PATH = "converter/blockmap256.json";
+    private static final String BLOCKMAP_PATH = "blockmap256.json";
     private static final String PLACEHOLDER_BLOCK = "block.minecraft.air";
 
     HashMap<String, Byte> mBlockMap;
@@ -47,11 +48,7 @@ public class BlockConverter {
      */
     private BlockConverter() {
         try {
-            String path = getClass().getClassLoader().getResource(BLOCKMAP_PATH).getPath();
-            // I don't know why but a weird substring gets inserted and needs to be removed, e.g. "%124!"
-            if(path.split("%.*!").length > 1) {
-                path = path.split("%.*!")[0] + path.split("%.*!")[1];
-            }
+            String path = Utility.getResourcePath(this, BLOCKMAP_PATH);
             Reader reader = Files.newBufferedReader(Path.of(path));
             Type T = new TypeToken<HashMap<String, Byte>>() {}.getType();
             mBlockMap = new Gson().fromJson(reader, T);
