@@ -2,71 +2,61 @@
 ('Hybrid-Arcade' project for short)
 
 ## Description
-This is part of a research project for the University of Nottingham. The research is about analysing and selecting  different physical data representations (e.g. barcodes) so that a large amount of game data can be stored and transported physically without using a network or a database.
+This is part of a dissertation for the University of Nottingham. The research is about analysing and selecting  different physical data representations (e.g. barcodes) and compression methods so that a large amount of game data can be stored and transported physically without using a network or a database.
 
-Minecraft was selected as an example a, since it is very modifiable and it has 3-dimensional spaces that would need a high capacity to be stored. The mod should work like so:
-1. A player can select a 3-dimensional space in the game.
-1. The selected space can be printed out as an encoding on a card or saved as an image.
-1. Later, the encoding can be scanned to bring the selected space back into the game's memory, even on other game-worlds or PCs.
-1. The selected space can be placed back into the game, along with all the blocks that were originally in the space.
+This project allows a 3D space in Minecraft to be selected and printed physically with a barcode that represents all the blocks inside the 3D space. The barcode can then be scanned later to recreate the blocks in another Minecraft world.
 
-## Setup
-There are 3 stages to setup: compiling the C dependencies, compling the C local binary and connecting a scanner webserver.
+### Functionality
 
-The project uses the Java JVM with Gradle for most of the work, and uses compiled C code for the 
-[JabCode data encodings][jabcode_library] because it's open-source library is written in C. These 
-instructions are for a Linux operating system.
+In a new 'creative world' give yourself 'Marker Blocks', some other building blocks of your choice,
+a 'Red Magic Wand' and a 'Blue Magic Wand'. Now you can:
 
-### Compiling Dependencies
-The libraries used by the core jabcode library need to be compiled with special compiler instructions
-so that they work within the Java Native Interface (JNI).
+#### Copy to encoding
+1. Build something and surround it with marker blocks in two 'L' shapes.
+2. Left-click the marker blocks with the Copy Wand to select them.
+3. Right-click after selecting to copy them. This will save an encoding to the disk!
 
-#### Libz
-* Download and extract the latest version: https://www.zlib.net/. 
-* Edit the `Makefile` so that the CFLAGS and SFLAGs contain the following:
-```makefile
-CFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN -D_REENTRANT -D_POSIX_C_SOURCE
-SFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN -D_REENTRANT -D_POSIX_C_SOURCE
+Copying a House:
+
+![Copied House][copy_image]
+
+The encoding using the House's data (as of v1.5.3):
+
+![Created Encoding][copy_barcode]
+
+#### Paste from encoding
+* Place your new encoding in-front of the scanner, using a phone or a print-out.
+* Right-click the Paste Wand on the ground to scan.
+* Place down a marker block and left-click it with the wand to paste the blocks back into the game!
+
+The house replicated somewhere entirely new by scanning the encoding:
+
+![Pasted House][paste_image]
+
+## Building
+To build and install the modification, first compile the C library and then run the build command to compile and build the Java code. Requires GCC for linux and x86_64-w64-mingw32-gcc for Windows.
+```bash
+# Linux Target
+./gradlew compileCLibrary build
+# Windows Target
+./gradlew compileCLibraryWin build
 ```
-* Compile with the following commands:
-```
-./configure
-make clean
-make
-```
-* Verify that `libz.a` exists inside of the local directory.
+The built library will be located in 'build/jar'.
 
-#### Libpng16
-* Download and extract the latest version: http://www.libpng.org/.
-* Compile with the following commands. You will get some errors about libraries failing to install in
-/usr/local/lib, ignore them because we don't want that to happen anyway:
-```
-./configure CFLAGS="-fPIC -D_REENTRANT -D_POSIX_C_SOURCE" CXXFLAGS="-fPIC -D_REENTRANT -D_POSIX_C_SOURCE" --libdir=/home/$USER/Downloads/libpng_compiled
-make clean
-make install
-```
-* Verify that `libpng16.a` exists inside of the `~/Downloads/libpng_compiled` directory.
+The C library uses the jabcode, png and Z libraries that have been precompiled for x86_64 linux and windows at 'src/main/c/clib'. If there are issues linking them on your target system them please refer to [Library Help document][library_help].
 
-#### Jabcode Fork
-* Clone the forked jabcode repository: https://github.com/carlossss111/jabcode_fork
-* Copy the `libz.a` and `libpng16.a` that have just been compiled, and move them into `src/jabcode/lib`, replacing
-the already existing library files.
-* Compile with the Makefile inside of `src/jabcode`. The binary should be created inside `src/jabcode/build`.
-* Copy the `libjabcode.a` file into this repository's `src/main/c/clib`.
+## Installing
+1. Locate the hybrid-arcade jar in 'build/jar', the 'blockmap256.json' in 'build/resources/main/data/hybridarcade/blockmap256.json' and the library files in 'build/resources/main/encoding'.
+2. Install the [Minecraft Forge Mod Loader v47.2.1][forge_download].
+3. Move the .jar, .json and library files (DLL for windows, SO for linux) into your .minecraft/mods folder.
+4. Start the minecraft launcher and select the Forge option. Go to advanced options and add '-Djava.library.path=PATH/TO/YOUR/MODS/FOLDER' to the JVM argument string.
 
-### Compiling Local Files
-Running this repository's makefile with the correct statically linked binaries, you should see libJabEncoder.so 
-be created in the resources/encoding directory.
-```
-./gradlew compileCLibrary
-```
-If there are errors, they may be because `-fPIC -D_REENTRANT -D_POSIX_C_SOURCE` was not
-set when compiling **every** library.
+The modification should now be installed and ready to go!
 
-Changes to the `src/main/c/JabEncoder.c` require this makefile to be re-run before running.
+## Adding a Scanner
+By default, the scanner is mocked with `MOCK_SCANNER = true` enabled in PasteItem.java, therefore it reads an image at 'mock_barcode.png' in the minecraft folder. To enable the scanner set this to false and set up a network scanner.
 
-### Setting up the Scanner
-To use the scanning functionality, a local network server with a camera needs to be setup on the network to listen for requests 
+A local network server with a camera needs to be setup on the network to listen for requests 
 and return a PNG image of what it can see in-front of it. The scanner needs to be listening at **http[]()://raspberrypi.local:5000**.
 There is no need to connect it to the internet.
 
@@ -78,63 +68,32 @@ The webserver can be started with e.g.
 flask --app scanner.py run --host=0.0.0.0
 ```
 
-### Setting up the Printer
-The game uses the system print drivers and a connected printer, there is no configuration needed.
+## Adding a Printer
+By default, the printer is mocked with `MOCK_PRINTER = true` enabled in CopyItem.java, therefore it saves an image at 'mock_barcode.png' in the minecraft folder. To enable the printer set this to false and connect a printer to the network.
 
-## Running the Game Client
-Given that the C library is compiled, tests can be run with
-```
-./gradlew test
-```
-and the application can be run with
+The game uses the system print drivers and a connected printer, there is no additional configuration needed.
+
+## Dev Tasks
+The application can be run in a locally built test environment with:
 ```
 ./gradlew runClient
 ```
-The Java code doesn't need to be compiled manually as it is handled by the JVM.
 
-## Usage In-game
-In a new 'creative world' give yourself 'Marker Blocks', some other building blocks of your choice, 
-a 'Red Magic Wand' and a 'Blue Magic Wand'. Now you can:
-
-### Copy to encoding
-* Build something and surround it with marker blocks in two 'L' shapes.
-* Left-click the marker blocks with the Red Wand to select them.
-* Right-click after selecting to copy them. This will save an encoding to the disk!
-
-Copying a House:
-
-![Copied House][copy_image]
-
-The encoding using the House's data:
-
-![Created Encoding][copy_barcode]
-
-### Paste from encoding
-* Place your new encoding in-front of the scanner, using a phone or a print-out.
-* Right-click the Blue Wand on the ground to scan.
-* Place down a marker block and left-click it with the Wand to paste the blocks back into the game!
-
-The house replicated somewhere entirely new by scanning the encoding:
-
-![Pasted House][paste_image]
-
-## Javadocs
-Generate javadocs to the `docs/` directory with
+Javadocs for all public classes can be generated to the `docs/` directory with:
 ```
 ./gradlew javadoc
 ```
-and open in a web browser.
 
-## Testing
-Run unit tests with:
+Unit tests can be run with:
 ```
 ./gradlew test
 ```
-and run performance tests with:
+
+Performance tests can be run and logged to the `logs/` directory with
 ```
-./gradlew performanceAnalysis
+./gradlew readAnalysis
+./gradlew writeAnalysis
 ```
-Performance logs are written into a 'logs' directory in the project root.
 
 ## Authors
 Written by: Daniel Robinson / psydr2@nottingham.ac.uk
@@ -149,6 +108,9 @@ Supervised by: Steve Bagley
 * ZLib is provided with a permissive license, [see link][zlib_license].
 * Dependencies imported from Gradle like Log4j and JUnit have licenses which allow their use.
 
+[minecraft_EULA]: https://www.minecraft.net/en-us/eula
+[library_help]: src/main/c/clib/LIBRARY_README.md
+[forge_download]: https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html
 [jabcode_library]: https://jabcode.org/ "Jabcode Library"
 [license]: LICENSE.txt "Project License"
 [jabcode_fork]: https://github.com/carlossss111/jabcode_fork "Jabcode Fork"
