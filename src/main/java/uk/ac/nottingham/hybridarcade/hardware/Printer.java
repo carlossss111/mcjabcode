@@ -50,7 +50,7 @@ public class Printer {
      */
     // If we go diagonally up and right we are guaranteed to encounter
     // the finder pattern and can use this to determine the module width.
-    private int findModuleWidthPx(BufferedImage barcode) throws IllegalArgumentException{
+    public int findModuleWidthPx(BufferedImage barcode) throws IllegalArgumentException{
         final Color finderPatternPrimary = new Color(0x00FFFF);
         final Color finderPatternSecondary = new Color(0x000000);
 

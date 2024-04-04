@@ -2,10 +2,13 @@ package performance;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import uk.ac.nottingham.hybridarcade.compression.*;
 import uk.ac.nottingham.hybridarcade.encoding.JabEncoder;
 import uk.ac.nottingham.hybridarcade.hardware.Printer;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -56,6 +59,15 @@ public class WritePerformance {
         mPrinter = new Printer(mMockPrintJob);
     }
 
+    public float findBarcodeMinWidth(BufferedImage barcode) throws IOException{
+        ByteArrayOutputStream asBytes = new ByteArrayOutputStream();
+        ImageIO.write(barcode, "png", asBytes);
+        PDDocument doc = new PDDocument();
+        PDImageXObject pdImage = PDImageXObject.createFromByteArray(doc, asBytes.toByteArray(), null);
+        int numOfModulesOnSide = pdImage.getWidth() / mPrinter.findModuleWidthPx(pdImage.getImage());
+        return numOfModulesOnSide * 0.33f; // 0.33mm per module
+    }
+
     /* Testing */
 
     // Tries to compress, encode and mock print
@@ -70,14 +82,17 @@ public class WritePerformance {
             return 0;
         }
 
+        float physWidth;
         try{
+            physWidth = findBarcodeMinWidth(barcodePNG);
             mPrinter.print(barcodePNG);
         }
         catch(IOException | IllegalArgumentException | PrinterException e){
            log.info(String.format("FAIL: at PRINT with raw=%d\n%s", rawBytes.length, e));
             return 0;
         }
-        log.info(String.format("raw=%d, compressed=%d", rawBytes.length, compressedBytes.length));
+        log.info(String.format("raw=%d, compressed=%d, width=%.2f", rawBytes.length,
+                compressedBytes.length, physWidth));
         return rawBytes.length;
     }
 
