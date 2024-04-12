@@ -34,19 +34,22 @@ The house replicated somewhere entirely new by scanning the encoding:
 ![Pasted House][paste_image]
 
 ## Building
-To build and install the modification, first compile the C library and then run the build command to compile and build the Java code. Requires GCC for linux and x86_64-w64-mingw32-gcc for Windows.
+To build and install the modification, first compile the C library on a linux machine and then run the build command to compile and build the Java code. Requires GCC for a linux target and x86_64-w64-mingw32-gcc for a windows target.
 ```bash
 # Linux Target
 ./gradlew compileCLibrary build
 # Windows Target
 ./gradlew compileCLibraryWin build
 ```
-The built library will be located in 'build/jar'.
+The built library will be located in 'build/libs/jar'.
 
 The C library uses the jabcode, png and Z libraries that have been precompiled for x86_64 linux and windows at 'src/main/c/clib'. If there are issues linking them on your target system them please refer to [Library Help document][library_help].
 
+If at this point you would like to skip the installation and run the program in a test environment,
+run `./gradlew runClient`.
+
 ## Installing
-1. Locate the hybrid-arcade jar in 'build/jar', the 'blockmap256.json' in 'build/resources/main/data/hybridarcade/blockmap256.json' and the library files in 'build/resources/main/encoding'.
+1. Locate the hybrid-arcade jar in 'build/libs/jar', the 'blockmap256.json' in 'build/resources/main/data/hybridarcade/blockmap256.json' and the library files in 'build/resources/main/encoding'.
 2. Install the [Minecraft Forge Mod Loader v47.2.1][forge_download].
 3. Move the .jar, .json and library files (DLL for windows, SO for linux) into your .minecraft/mods folder.
 4. Start the minecraft launcher and select the Forge option. Go to advanced options and add '-Djava.library.path=PATH/TO/YOUR/MODS/FOLDER' to the JVM argument string.
