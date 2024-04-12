@@ -6,10 +6,11 @@
 
 # Build Dirs
 bin/
-build/
 run/
 logs/
 docs/
+build/*
+!build/.gitkeep
 
 # Other
 *.old
