@@ -201,11 +201,3 @@ task writeAnalysis(type: JavaExec) {
     mainClass = "performance.Runner"
     args "write"
 }
-
-task performanceAnalysis {
-    group = "Performance Analysis"
-    description = "Runs both encoding and decoding performance analysis"
-
-    dependsOn "writeAnalysis"
-    dependsOn "readAnalysis"
-}
